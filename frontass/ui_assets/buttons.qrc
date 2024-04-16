@@ -1,0 +1,33 @@
+<RCC>
+  <qresource prefix="toggle">
+    <file alias="on">State=On, Enabled=Truew.png</file>
+    <file alias="off">State=Off, Enabled=Truew.png</file>
+    <file alias="on_dis">State=On, Enabled=Falsew.png</file>
+    <file alias="off_dis">State=Off, Enabled=Falsew.png</file>
+  </qresource>
+  <qresource prefix="gear">
+    <file alias="white">gearshape.fill.white.png</file>
+    <file alias="black">gearshape.fill.black.png</file>
+  </qresource>
+  <qresource prefix="combobox">
+    <file alias="1x">Combo Box Button1x.png</file>
+    <file alias="2x">Combo Box Button2x.png</file>
+    <file alias="3x">Combo Box Button3x.png</file>
+    <file alias="4x">Combo Box Button4x.png</file>
+    <file alias="512w">Combo Box Button.png</file>
+  </qresource>
+  <qresource prefix="pump">
+    <file alias="off">fuelpump_off.png</file>
+    <file alias="on">fuelpump_on.png</file>
+  </qresource>
+  <qresource prefix="auto">
+    <file alias="auto">autostartstop.png</file>
+    <file alias="man">autostartstop_slash.png</file>
+  </qresource>
+  <qresource prefix="power">
+    <file alias="off">power_off.png</file>
+    <file alias="on">power_on.png</file>
+    <file alias="off4">power_off4.png</file>
+    <file alias="off3">power_off3.png</file>
+  </qresource>
+</RCC>
