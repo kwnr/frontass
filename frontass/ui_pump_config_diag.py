@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QDialog, QLabel
+from PySide6.QtWidgets import QDialog
 from ui_assets.ui_pump_config_diag import Ui_Dialog
 
 

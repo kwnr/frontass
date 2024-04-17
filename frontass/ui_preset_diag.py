@@ -1,8 +1,6 @@
 from ui_assets.preset_mode_diag_ui import Ui_Dialog
-from PySide6.QtWidgets import QDialog, QLabel, QToolButton, QDoubleSpinBox, QFileDialog, QCheckBox, QApplication
-from PySide6.QtCore import QDir, Slot
+from PySide6.QtWidgets import QDialog, QFileDialog, QApplication
 import pandas as pd
-import os
 
 
 class UIPresetDiag(QDialog, Ui_Dialog):
@@ -14,7 +12,9 @@ class UIPresetDiag(QDialog, Ui_Dialog):
         self._is_preset_modified = False
         self._is_preset_loaded = False
 
-        self.file_diag = QFileDialog(None, "", "/home/kwnr/arm_ws/src/aic_ui/preset_files", "csv files (*.csv)")
+        self.file_diag = QFileDialog(
+            None, "", "/home/kwnr/arm_ws/src/aic_ui/preset_files", "csv files (*.csv)"
+        )
         self.toolButton.clicked.connect(self.file_diag.exec)
 
         self.preset_file = pd.DataFrame()
@@ -23,13 +23,29 @@ class UIPresetDiag(QDialog, Ui_Dialog):
         self.preset_file_path.returnPressed.connect(
             lambda: self.load_preset_file(self.preset_file_path.text)
         )
-        self.preset_list_cbx.currentTextChanged.connect(self.cb_on_preset_list_cbx_changed)
-        self.joint_list = [f"L{i}" for i in range(1, 9)] + [f"R{i}" for i in range(1, 9)]
+        self.preset_list_cbx.currentTextChanged.connect(
+            self.cb_on_preset_list_cbx_changed
+        )
+        self.joint_list = [f"L{i}" for i in range(1, 9)] + [
+            f"R{i}" for i in range(1, 9)
+        ]
         self.joint_spinbox_list = [
-            self.l1DoubleSpinBox, self.l2DoubleSpinBox, self.l3DoubleSpinBox, self.l4DoubleSpinBox,
-            self.l5DoubleSpinBox, self.l6DoubleSpinBox, self.l7DoubleSpinBox, self.l8DoubleSpinBox,
-            self.r1DoubleSpinBox, self.r2DoubleSpinBox, self.r3DoubleSpinBox, self.r4DoubleSpinBox,
-            self.r5DoubleSpinBox, self.r6DoubleSpinBox, self.r7DoubleSpinBox, self.r8DoubleSpinBox,
+            self.l1DoubleSpinBox,
+            self.l2DoubleSpinBox,
+            self.l3DoubleSpinBox,
+            self.l4DoubleSpinBox,
+            self.l5DoubleSpinBox,
+            self.l6DoubleSpinBox,
+            self.l7DoubleSpinBox,
+            self.l8DoubleSpinBox,
+            self.r1DoubleSpinBox,
+            self.r2DoubleSpinBox,
+            self.r3DoubleSpinBox,
+            self.r4DoubleSpinBox,
+            self.r5DoubleSpinBox,
+            self.r6DoubleSpinBox,
+            self.r7DoubleSpinBox,
+            self.r8DoubleSpinBox,
         ]
 
     def load_preset_file(self, path):
@@ -61,13 +77,6 @@ class UIPresetDiag(QDialog, Ui_Dialog):
         self.r7DoubleSpinBox.setValue(self.preset_file.loc[name]["R7"])
         self.r8DoubleSpinBox.setValue(self.preset_file.loc[name]["R8"])
 
-    @Slot()
-    def get_preset_file(self):
-        filename = QFileDialog.getOpenFileName(self,
-                                               "Open Preset File",
-                                               "/home/kwnr/arm_ws/src/aic_ui/preset_files",
-                                               "csv files (*.csv)",)
-
     @property
     def is_on_preset_mode(self):
         return self._is_on_preset_mode
@@ -85,7 +94,7 @@ class UIPresetDiag(QDialog, Ui_Dialog):
         self._is_preset_modified = value
         original_text = self.preset_status_text.text()
         if value and "*" not in original_text:
-            self.preset_status_text.setText(original_text+"*")
+            self.preset_status_text.setText(original_text + "*")
         elif not value and "*" in original_text:
             self.preset_status_text.setText(original_text[-2])
 
