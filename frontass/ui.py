@@ -1,3 +1,8 @@
+import sys
+
+sys.path.append("/home/kwnr/ros2ws/src/frontass/frontass/ui_assets")
+sys.path.append("/home/kwnr/ros2ws/src/frontass/frontass")
+
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -6,23 +11,28 @@ from PySide6.QtWidgets import (
     QDialogButtonBox,
 )
 from PySide6.QtCore import Slot, QTimer
+import rclpy.exceptions
 from ui_assets.control_panel_ui import Ui_MainWindow
 from ui_state_diag import UiStateDiag
 from ui_fig_select_diag import UIFigSelectDiag
 from ui_pump_config_diag import UIPumpConfigDiag
 from ui_preset_diag import UIPresetDiag
 from ui_pose_iterator import UIPoseIterator
+from ui_moveit import UIMoveit
 from utils import BlitManager
 
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_system_default
-from interass.msg import Robot2UI, Hold, Preset, UIAction, PoseIteration
+from ass_msgs.msg import Robot2UI, Hold, Preset, UIAction, PoseIteration
+from sensor_msgs.msg import JointState
 
+from threading import Thread
 from typing import List
 from itertools import compress
 import numpy as np
 import nmcli
+
 # from subprocess import Popen, PIPE
 
 from matplotlib.backends.backend_qtagg import FigureCanvas
@@ -114,8 +124,9 @@ class UI(QMainWindow, Ui_MainWindow):
         self.pump_power_btn.toggled.connect(self.cb_ui_action)
         self.pump_mode_btn.toggled.connect(self.cb_ui_action)
 
-        self.pump_config_diag = UIPumpConfigDiag()
+        self.pump_config_diag = UIPumpConfigDiag(self)
         self.pump_config_btn.clicked.connect(self.pump_config_diag.show)
+        self.pump_config_btn.clicked.connect(self.pump_config_diag.activateWindow)
         self.pump_config_diag.manualTargetRPMLineEdit.setText(str(self.pump_tgt_speed))
         self.pump_config_diag.autoRangeMinLineEdit.setText(str(self.pump_min_rpm))
         self.pump_config_diag.autoRangeMaxLineEdit.setText(str(self.pump_max_rpm))
@@ -126,7 +137,7 @@ class UI(QMainWindow, Ui_MainWindow):
 
         # arm_power_frame
         self.preset_pos = np.zeros(16)
-        self.preset_diag = UIPresetDiag()
+        self.preset_diag = UIPresetDiag(self)
         self.preset_pub = self.node.create_publisher(
             Preset, "preset", qos_profile_system_default
         )
@@ -321,7 +332,7 @@ class UI(QMainWindow, Ui_MainWindow):
         self.pose_iter_publisher = self.node.create_publisher(
             PoseIteration, "pose_iter", qos_profile_system_default
         )
-        self.pose_iteration_diag = UIPoseIterator(self.pose_iter_publisher)
+        self.pose_iteration_diag = UIPoseIterator(self, self.pose_iter_publisher)
         self.start_pose_iteration_btn.clicked.connect(self.pose_iteration_diag.show)
 
         self.start_pose_iteration_btn.clicked.connect(self.pose_iter_timer.start)
@@ -482,7 +493,7 @@ class UI(QMainWindow, Ui_MainWindow):
         self.panel_1s_timer.start(1000)
 
         # show state dialog
-        self.state_diag = UiStateDiag()
+        self.state_diag = UiStateDiag(self)
         self.show_state_btn.clicked.connect(self.state_diag.show)
         self.table_timer = QTimer(self)
         self.table_timer.setInterval(250)
@@ -503,9 +514,44 @@ class UI(QMainWindow, Ui_MainWindow):
         self.state_diag.finished.connect(self.table_timer.stop)
 
         # show fig select dialog
-        self.fig_sel_diag = UIFigSelectDiag()
+        self.fig_sel_diag = UIFigSelectDiag(self)
         self.arm_graph_tool_btn.clicked.connect(self.fig_sel_diag.show)
         self.fig_sel_diag.checkbox_state = np.zeros((6, 16)).astype(bool)
+
+        self.ik_diag = UIMoveit(self)
+        self.ik_mode_btn.clicked.connect(self.ik_diag.show)
+        self.joint_state_publisher = self.node.create_publisher(
+            JointState, "joint_states", qos_profile_system_default
+        )
+        self.ik_diag.ik_traj_timer.timeout.connect(lambda: self.ik_diag.traj_timer_cb(self.joint_pos))
+        self.ik_diag.ik_pos_timer.timeout.connect(lambda: self.ik_diag.pos_timer_cb(self.joint_pos))
+        
+        self.ik_mode_btn.clicked.connect(self.ik_diag.ik_pos_timer.start)
+        self.ik_diag.finished.connect(self.ik_diag.ik_pos_timer.stop)
+        self.ik_diag.ik_traj_pos_changed.connect(self.publish_pose_override)
+
+        self.preset_diag.enable_preset_mode_btn.clicked.connect(lambda: self.ik_diag.IKEnableBtn.setChecked(False))
+        self.preset_diag.enable_preset_mode_btn.clicked.connect(lambda: self.pose_iteration_diag.enabled_btn.setChecked(False))
+        self.pose_iteration_diag.enabled_btn.clicked.connect(lambda: self.preset_diag.enable_preset_mode_btn.setChecked(False))
+        self.pose_iteration_diag.enabled_btn.clicked.connect(lambda: self.ik_diag.IKEnableBtn.setChecked(False))
+        self.ik_diag.IKEnableBtn.clicked.connect(lambda: self.preset_diag.enable_preset_mode_btn.setChecked(False))
+        self.ik_diag.IKEnableBtn.clicked.connect(lambda: self.pose_iteration_diag.enabled_btn.setChecked(False))
+
+        self.th_spin = Thread(target=rclpy.spin, kwargs={"node": self.node})
+        self.th_spin.start()
+        
+        # self.destroyed.connect(self.ik_diag.armstrong.shutdown)
+        
+    def publish_pose_override(self, value):
+        message = PoseIteration()
+        message.enabled = value[0]
+        message.poses = value[1]
+        if len(value) < 3:
+            pass
+        else:
+            pass
+        self.pose_iter_publisher.publish(message)
+            
 
     def cb_pump_config_accepted(self):
         self.pump_tgt_speed = int(self.pump_config_diag.manualTargetRPMLineEdit.text())
@@ -627,7 +673,29 @@ class UI(QMainWindow, Ui_MainWindow):
         self.des_cur_text.setText(f"{self.pump_des_cur:.2f}")
         self.elmo_temp_text.setText(f"{self.pump_elmo_temp:.2f}")
         self.disp_track_progress_bar(self.track_left_status, self.track_right_status)
-        rclpy.spin_once(self.node, timeout_sec=0)
+        
+        joint_state = JointState()
+        joint_state.name = [
+            "joint1_left", "joint2_left", "joint3_left", "joint4_left", "joint5_left", "joint6_left",
+            "joint7r_1_left", "joint7r_left", "joint7r_2_left",
+            "joint7l_1_left", "joint7l_left", "joint7l_2_left",
+            "joint8_left",
+            "joint1_right", "joint2_right", "joint3_right", "joint4_right", "joint5_right", "joint6_right", 
+            "joint7r_1_right", "joint7r_right", "joint7r_2_right",
+            "joint7l_1_right", "joint7l_right", "joint7l_2_right",
+            "joint8_right",
+        ]
+        joint_pos = np.deg2rad(self.joint_pos)
+        joint_pos = np.insert(joint_pos, 6, [joint_pos[6]]*5)
+        joint_pos = np.insert(joint_pos, -2, [joint_pos[-2]]*5)
+        joint_pos[7] *= -1
+        joint_pos[9] *= -1
+        joint_pos[11] *= -1
+        joint_pos[20] *= -1
+        joint_pos[22] *= -1
+        joint_pos[24] *= -1
+        joint_state.position = joint_pos.tolist()
+        self.joint_state_publisher.publish(joint_state)
 
     def cb_timer_1s_panel(self):
         """client_conn = self.get_wifi_info()
@@ -743,9 +811,13 @@ class UI(QMainWindow, Ui_MainWindow):
         return current_conn
 
 
-if __name__ == "__main__":
+def main():
     rclpy.init(domain_id=0)
     app = QApplication()
     w = UI()
     w.show()
     app.exec()
+
+
+if __name__ == "__main__":
+    main()

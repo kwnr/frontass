@@ -4,8 +4,8 @@ import pandas as pd
 
 
 class UIPresetDiag(QDialog, Ui_Dialog):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent):
+        super().__init__(parent)
         self.setupUi(self)
 
         self._is_on_preset_mode = False

@@ -4,8 +4,8 @@ import numpy as np
 
 
 class UIFigSelectDiag(QDialog, Ui_Dialog):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent):
+        super().__init__(parent)
         self.setupUi(self)
         self.checkbox_state = np.zeros((6, 16)).astype(bool)
 

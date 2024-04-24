@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>562</width>
-    <height>772</height>
+    <width>568</width>
+    <height>830</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -175,7 +175,7 @@
     <string>Orientation</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="l1_power_btn">
+  <widget class="QPushButton" name="IKEnableBtn">
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -235,7 +235,7 @@
     <bool>true</bool>
    </property>
    <property name="checked">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="flat">
     <bool>true</bool>
@@ -255,12 +255,12 @@
 Enabled</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="planBtn">
    <property name="geometry">
     <rect>
      <x>390</x>
      <y>100</y>
-     <width>150</width>
+     <width>161</width>
      <height>50</height>
     </rect>
    </property>
@@ -268,7 +268,7 @@ Enabled</string>
     <string>PLAN</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_2">
+  <widget class="QPushButton" name="ExecBtn">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -276,7 +276,7 @@ Enabled</string>
     <rect>
      <x>390</x>
      <y>160</y>
-     <width>150</width>
+     <width>161</width>
      <height>50</height>
     </rect>
    </property>
@@ -284,27 +284,139 @@ Enabled</string>
     <string>EXECUTE</string>
    </property>
   </widget>
-  <widget class="QTableWidget" name="tableWidget">
+  <widget class="QTableWidget" name="iter_table">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>280</y>
-     <width>521</width>
-     <height>481</height>
+     <x>20</x>
+     <y>260</y>
+     <width>531</width>
+     <height>541</height>
     </rect>
    </property>
+   <property name="verticalScrollBarPolicy">
+    <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+   </property>
+   <property name="horizontalScrollBarPolicy">
+    <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+   </property>
+   <attribute name="verticalHeaderStretchLastSection">
+    <bool>true</bool>
+   </attribute>
+   <row>
+    <property name="text">
+     <string>L1</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>L2</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>L3</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>L4</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>L5</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>L6</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>L7</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>L8</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>R1</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>R2</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>R3</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>R4</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>R5</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>R6</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>R7</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>R8</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>time</string>
+    </property>
+   </row>
+   <column>
+    <property name="text">
+     <string>Position</string>
+    </property>
+   </column>
   </widget>
-  <widget class="QLabel" name="label_4">
+  <widget class="QLabel" name="plan_status_label">
    <property name="geometry">
     <rect>
      <x>390</x>
      <y>220</y>
-     <width>151</width>
+     <width>171</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
     <string>status: NOT PLANNED</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="getPoseBtn">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>40</y>
+     <width>161</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Get Current Pose</string>
    </property>
   </widget>
  </widget>

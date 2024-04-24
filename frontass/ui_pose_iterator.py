@@ -1,7 +1,7 @@
-from ui_assets.pose_iterator_diag_ui import Ui_Dialog
-from PySide6.QtWidgets import QDialog, QFileDialog, QTableWidgetItem
 from PySide6.QtCore import QDir, QTimer
 from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QDialog, QFileDialog, QTableWidgetItem
+from ui_assets.pose_iterator_diag_ui import Ui_Dialog
 
 import pandas as pd
 import numpy as np
@@ -9,8 +9,8 @@ import time
 
 
 class UIPoseIterator(QDialog, Ui_Dialog):
-    def __init__(self, publisher):
-        super().__init__()
+    def __init__(self, parent, publisher):
+        super().__init__(parent)
         self.setupUi(self)
         self.file_path = ""
         self.pose_df = pd.DataFrame()
