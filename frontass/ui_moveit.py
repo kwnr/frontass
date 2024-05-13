@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QDialog, QTableWidget, QTableWidgetItem
 from PySide6.QtCore import QTimer, Signal
-from PySide6.QtGui import QColor 
+from PySide6.QtGui import QColor
 from ui_assets.ik_ui import Ui_Dialog
 
 from moveit.core.robot_state import RobotState
@@ -18,7 +18,7 @@ import pandas as pd
 import time
 
 class UIMoveit(QDialog, Ui_Dialog):
-    ik_traj_pos_changed = Signal(list)        
+    ik_traj_pos_changed = Signal(list)
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
@@ -36,9 +36,6 @@ class UIMoveit(QDialog, Ui_Dialog):
         self.arm_model = self.armstrong.get_robot_model()
         self.planning_scene_monitor = self.armstrong.get_planning_scene_monitor()
         self.arm_state = RobotState(self.arm_model)
-        
-        self.multi_pipeline_plan_request_param = MultiPipelinePlanRequestParameters(
-            self.armstrong, ['ompl', 'pilz_industrial_motion_planner'])
 
         self.ik_enabled = False
 
@@ -48,13 +45,13 @@ class UIMoveit(QDialog, Ui_Dialog):
 
         self.planBtn.clicked.connect(self.plan)
         self.ExecBtn.clicked.connect(self.execute)
-        
+
         self.plan_result = None
         self.start_time = 0.
 
         self.ik_pos_timer = QTimer(self)
         self.ik_pos_timer.setInterval(100)
-        
+
         self.ik_traj_timer = QTimer(self)
         self.ik_traj_timer.setInterval(10)
 
@@ -94,7 +91,7 @@ class UIMoveit(QDialog, Ui_Dialog):
         goal.pose.orientation.w = float(self.wCurOriLineEdit.text())
 
         self.moveit_arm.set_goal_state(pose_stamped_msg=goal, pose_link="goal_right")
-        plan_result = self.moveit_arm.plan(multi_plan_parameters=self.multi_pipeline_plan_request_param)
+        plan_result = self.moveit_arm.plan()
         if plan_result:
             self.plan_status_label.setText("status: PLANNED")
             self.ExecBtn.setEnabled(True)
@@ -111,19 +108,19 @@ class UIMoveit(QDialog, Ui_Dialog):
                 point.time_from_start.sec * 1e9 + point.time_from_start.nanosec for point in self.trajectory_points])
             self.pose_df = self.build_df(self.trajectory_positions, self.trajectory_nsec_from_start)
             self.set_table(self.pose_df)
-        
+
     def execute(self):
         self.start_time = time.time_ns()
         self.plan_status_label.setText("status: EXECUTING")
         self.ik_traj_timer.start()
-    
+
     def build_df(self, positions, nanosecs):
         point = np.rad2deg(positions)
         self.pose_df = pd.DataFrame(index=[f'L{i}' for i in range(1,9)]+[f'R{i}' for i in range(1,9)]+["time"], columns=[str(i) for i, p in enumerate(point)])
         self.pose_df.iloc[8:14] = np.rad2deg(positions).T
         self.pose_df.iloc[16] = nanosecs
         return self.pose_df
-        
+
     def set_table(self, pose_df):
         cx = self.iter_table.columnCount() - 1
         if self.pose_df.shape[1] > cx:
@@ -134,7 +131,7 @@ class UIMoveit(QDialog, Ui_Dialog):
                 self.iter_table.removeColumn(cx - i)
         for col in range(pose_df.shape[1]):
             for row, pose in enumerate(pose_df.iloc[:, col]):
-                if row == 16:    
+                if row == 16:
                     self.iter_table.setItem(
                         row, col + 1, QTableWidgetItem(f"{pose/1e9:.2f}")
                     )
@@ -151,7 +148,7 @@ class UIMoveit(QDialog, Ui_Dialog):
         for i, p in enumerate(pos):
             item = QTableWidgetItem(f"{pos[i]:.2f}")
             self.iter_table.setItem(i, 0, item)
-        
+
     def traj_timer_cb(self, joint_pos):
         print(self.pose_df.shape)
         if self.pose_df.shape[1] == 0:
@@ -164,18 +161,18 @@ class UIMoveit(QDialog, Ui_Dialog):
         self.progress = int(self.pose_df.columns[0]) / int(self.pose_df.columns[-1])
         item = QTableWidgetItem(f"{self.progress * 100:.2f}%")
         self.iter_table.setItem(16, 0, item)
-        
+
         item = QTableWidgetItem(
             f"{time.time()-self.start_time:.2f}"
             if self.start_time != -1
             else "")
         self.iter_table.setItem(17, 0, item)
-        
+
         if time.time_ns() - self.start_time > target["time"]:
             self.set_table(self.pose_df)
             self.pose_df = self.pose_df.iloc[:, 1:]
             self.ik_traj_pos_changed.emit([self.IKEnableBtn.isChecked(), target[:16].to_numpy(), None])
-            
+
     def pos_timer_cb(self, joint_pos):
         self.update_pos_col(joint_pos)
 

@@ -33,7 +33,7 @@ from itertools import compress
 import numpy as np
 import nmcli
 
-# from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE
 
 from matplotlib.backends.backend_qtagg import FigureCanvas
 from matplotlib.figure import Figure
@@ -525,7 +525,7 @@ class UI(QMainWindow, Ui_MainWindow):
         )
         self.ik_diag.ik_traj_timer.timeout.connect(lambda: self.ik_diag.traj_timer_cb(self.joint_pos))
         self.ik_diag.ik_pos_timer.timeout.connect(lambda: self.ik_diag.pos_timer_cb(self.joint_pos))
-        
+
         self.ik_mode_btn.clicked.connect(self.ik_diag.ik_pos_timer.start)
         self.ik_diag.finished.connect(self.ik_diag.ik_pos_timer.stop)
         self.ik_diag.ik_traj_pos_changed.connect(self.publish_pose_override)
@@ -539,9 +539,7 @@ class UI(QMainWindow, Ui_MainWindow):
 
         self.th_spin = Thread(target=rclpy.spin, kwargs={"node": self.node})
         self.th_spin.start()
-        
-        # self.destroyed.connect(self.ik_diag.armstrong.shutdown)
-        
+
     def publish_pose_override(self, value):
         message = PoseIteration()
         message.enabled = value[0]
@@ -551,7 +549,7 @@ class UI(QMainWindow, Ui_MainWindow):
         else:
             pass
         self.pose_iter_publisher.publish(message)
-            
+
 
     def cb_pump_config_accepted(self):
         self.pump_tgt_speed = int(self.pump_config_diag.manualTargetRPMLineEdit.text())
@@ -673,29 +671,6 @@ class UI(QMainWindow, Ui_MainWindow):
         self.des_cur_text.setText(f"{self.pump_des_cur:.2f}")
         self.elmo_temp_text.setText(f"{self.pump_elmo_temp:.2f}")
         self.disp_track_progress_bar(self.track_left_status, self.track_right_status)
-        
-        joint_state = JointState()
-        joint_state.name = [
-            "joint1_left", "joint2_left", "joint3_left", "joint4_left", "joint5_left", "joint6_left",
-            "joint7r_1_left", "joint7r_left", "joint7r_2_left",
-            "joint7l_1_left", "joint7l_left", "joint7l_2_left",
-            "joint8_left",
-            "joint1_right", "joint2_right", "joint3_right", "joint4_right", "joint5_right", "joint6_right", 
-            "joint7r_1_right", "joint7r_right", "joint7r_2_right",
-            "joint7l_1_right", "joint7l_right", "joint7l_2_right",
-            "joint8_right",
-        ]
-        joint_pos = np.deg2rad(self.joint_pos)
-        joint_pos = np.insert(joint_pos, 6, [joint_pos[6]]*5)
-        joint_pos = np.insert(joint_pos, -2, [joint_pos[-2]]*5)
-        joint_pos[7] *= -1
-        joint_pos[9] *= -1
-        joint_pos[11] *= -1
-        joint_pos[20] *= -1
-        joint_pos[22] *= -1
-        joint_pos[24] *= -1
-        joint_state.position = joint_pos.tolist()
-        self.joint_state_publisher.publish(joint_state)
 
     def cb_timer_1s_panel(self):
         """client_conn = self.get_wifi_info()
@@ -703,9 +678,9 @@ class UI(QMainWindow, Ui_MainWindow):
             client_conn_text = client_conn.signal
         else:
             client_conn_text = "Not Connected" """
-        # p = Popen(["ping", "-c1", "192.168.0.3"], stdout=PIPE, stdin=PIPE)
-        # res = p.communicate()
-        # self.ping_text.setText(res[0].decode().split('시간=')[1].split('\n')[0][:-3])
+        p = Popen(["ping", "-c1", "192.168.0.3"], stdout=PIPE, stdin=PIPE)
+        res = p.communicate()
+        self.ping_text.setText(res[0].decode().split('time=')[1].split('\n')[0][:-3]+" ms")
         # self.client_conn_text.setText(f"{client_conn_text}")
         self.read_rate_text.setText(f"{self.freq_read:.2f} Hz")
         self.cmd_rate_text.setText(f"{self.freq_cmd:.2f} Hz")
@@ -723,7 +698,7 @@ class UI(QMainWindow, Ui_MainWindow):
     @Slot()
     def pub_hold_toggle(self, btn: QPushButton, tgt: np.ndarray, idx: int, pub):
         tgt[idx] = not btn.isChecked()
-        pub.publish(self.is_on_hold)
+        pub.publish(Hold(enabled=self.is_on_hold))
 
     @Slot()
     def get_lineedit_text(self, btn: QLineEdit, store: list):
@@ -817,6 +792,7 @@ def main():
     w = UI()
     w.show()
     app.exec()
+    app.lastWindowClosed.connect(w.ik_diag.armstrong.shutdown)
 
 
 if __name__ == "__main__":
