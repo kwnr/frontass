@@ -15,8 +15,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QDialog, QFormLayout, QHeaderView,
-    QLabel, QLineEdit, QPushButton, QSizePolicy,
+from PySide6.QtWidgets import (QApplication, QDialog, QDoubleSpinBox, QFormLayout,
+    QHeaderView, QLabel, QPushButton, QSizePolicy,
     QTableWidget, QTableWidgetItem, QWidget)
 import buttons_rc
 
@@ -24,7 +24,7 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         if not Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
-        Dialog.resize(568, 830)
+        Dialog.resize(568, 879)
         self.formLayoutWidget = QWidget(Dialog)
         self.formLayoutWidget.setObjectName(u"formLayoutWidget")
         self.formLayoutWidget.setGeometry(QRect(20, 100, 160, 104))
@@ -37,21 +37,11 @@ class Ui_Dialog(object):
 
         self.current_position.setWidget(0, QFormLayout.LabelRole, self.xLabel)
 
-        self.xCurPosLineEdit = QLineEdit(self.formLayoutWidget)
-        self.xCurPosLineEdit.setObjectName(u"xCurPosLineEdit")
-
-        self.current_position.setWidget(0, QFormLayout.FieldRole, self.xCurPosLineEdit)
-
         self.yLabel = QLabel(self.formLayoutWidget)
         self.yLabel.setObjectName(u"yLabel")
         self.yLabel.setMinimumSize(QSize(0, 30))
 
         self.current_position.setWidget(1, QFormLayout.LabelRole, self.yLabel)
-
-        self.yCurPosLineEdit = QLineEdit(self.formLayoutWidget)
-        self.yCurPosLineEdit.setObjectName(u"yCurPosLineEdit")
-
-        self.current_position.setWidget(1, QFormLayout.FieldRole, self.yCurPosLineEdit)
 
         self.zLabel = QLabel(self.formLayoutWidget)
         self.zLabel.setObjectName(u"zLabel")
@@ -59,67 +49,78 @@ class Ui_Dialog(object):
 
         self.current_position.setWidget(2, QFormLayout.LabelRole, self.zLabel)
 
-        self.zCurPosLineEdit = QLineEdit(self.formLayoutWidget)
-        self.zCurPosLineEdit.setObjectName(u"zCurPosLineEdit")
+        self.xPosSpinBox = QDoubleSpinBox(self.formLayoutWidget)
+        self.xPosSpinBox.setObjectName(u"xPosSpinBox")
+        self.xPosSpinBox.setMinimum(-999.990000000000009)
+        self.xPosSpinBox.setMaximum(999.990000000000009)
 
-        self.current_position.setWidget(2, QFormLayout.FieldRole, self.zCurPosLineEdit)
+        self.current_position.setWidget(0, QFormLayout.FieldRole, self.xPosSpinBox)
+
+        self.yPosSpinBox = QDoubleSpinBox(self.formLayoutWidget)
+        self.yPosSpinBox.setObjectName(u"yPosSpinBox")
+        self.yPosSpinBox.setMinimum(-999.990000000000009)
+        self.yPosSpinBox.setMaximum(999.990000000000009)
+
+        self.current_position.setWidget(1, QFormLayout.FieldRole, self.yPosSpinBox)
+
+        self.zPosSpinBox = QDoubleSpinBox(self.formLayoutWidget)
+        self.zPosSpinBox.setObjectName(u"zPosSpinBox")
+        self.zPosSpinBox.setMinimum(-999.990000000000009)
+        self.zPosSpinBox.setMaximum(999.990000000000009)
+
+        self.current_position.setWidget(2, QFormLayout.FieldRole, self.zPosSpinBox)
 
         self.formLayoutWidget_3 = QWidget(Dialog)
         self.formLayoutWidget_3.setObjectName(u"formLayoutWidget_3")
-        self.formLayoutWidget_3.setGeometry(QRect(200, 100, 160, 140))
+        self.formLayoutWidget_3.setGeometry(QRect(200, 100, 160, 111))
         self.formLayout = QFormLayout(self.formLayoutWidget_3)
         self.formLayout.setObjectName(u"formLayout")
         self.formLayout.setContentsMargins(0, 0, 0, 0)
-        self.xCurOriLabel = QLabel(self.formLayoutWidget_3)
-        self.xCurOriLabel.setObjectName(u"xCurOriLabel")
-        self.xCurOriLabel.setMinimumSize(QSize(20, 30))
+        self.rollLabel = QLabel(self.formLayoutWidget_3)
+        self.rollLabel.setObjectName(u"rollLabel")
+        self.rollLabel.setMinimumSize(QSize(20, 30))
 
-        self.formLayout.setWidget(0, QFormLayout.LabelRole, self.xCurOriLabel)
+        self.formLayout.setWidget(0, QFormLayout.LabelRole, self.rollLabel)
 
-        self.xCurOriLineEdit = QLineEdit(self.formLayoutWidget_3)
-        self.xCurOriLineEdit.setObjectName(u"xCurOriLineEdit")
+        self.pitchLabel = QLabel(self.formLayoutWidget_3)
+        self.pitchLabel.setObjectName(u"pitchLabel")
+        self.pitchLabel.setMinimumSize(QSize(20, 30))
 
-        self.formLayout.setWidget(0, QFormLayout.FieldRole, self.xCurOriLineEdit)
+        self.formLayout.setWidget(1, QFormLayout.LabelRole, self.pitchLabel)
 
-        self.yCurOriLabel = QLabel(self.formLayoutWidget_3)
-        self.yCurOriLabel.setObjectName(u"yCurOriLabel")
-        self.yCurOriLabel.setMinimumSize(QSize(20, 30))
+        self.yawLabel = QLabel(self.formLayoutWidget_3)
+        self.yawLabel.setObjectName(u"yawLabel")
+        self.yawLabel.setMinimumSize(QSize(20, 30))
 
-        self.formLayout.setWidget(1, QFormLayout.LabelRole, self.yCurOriLabel)
+        self.formLayout.setWidget(2, QFormLayout.LabelRole, self.yawLabel)
 
-        self.yCurOriLineEdit = QLineEdit(self.formLayoutWidget_3)
-        self.yCurOriLineEdit.setObjectName(u"yCurOriLineEdit")
+        self.rollOriSpinBox = QDoubleSpinBox(self.formLayoutWidget_3)
+        self.rollOriSpinBox.setObjectName(u"rollOriSpinBox")
+        self.rollOriSpinBox.setMinimum(-360.000000000000000)
+        self.rollOriSpinBox.setMaximum(360.000000000000000)
 
-        self.formLayout.setWidget(1, QFormLayout.FieldRole, self.yCurOriLineEdit)
+        self.formLayout.setWidget(0, QFormLayout.FieldRole, self.rollOriSpinBox)
 
-        self.zCurOriLabel = QLabel(self.formLayoutWidget_3)
-        self.zCurOriLabel.setObjectName(u"zCurOriLabel")
-        self.zCurOriLabel.setMinimumSize(QSize(20, 30))
+        self.pitchOriSpinBox = QDoubleSpinBox(self.formLayoutWidget_3)
+        self.pitchOriSpinBox.setObjectName(u"pitchOriSpinBox")
+        self.pitchOriSpinBox.setMinimum(-360.000000000000000)
+        self.pitchOriSpinBox.setMaximum(360.000000000000000)
 
-        self.formLayout.setWidget(2, QFormLayout.LabelRole, self.zCurOriLabel)
+        self.formLayout.setWidget(1, QFormLayout.FieldRole, self.pitchOriSpinBox)
 
-        self.zCurOriLineEdit = QLineEdit(self.formLayoutWidget_3)
-        self.zCurOriLineEdit.setObjectName(u"zCurOriLineEdit")
+        self.yawOriSpinBox = QDoubleSpinBox(self.formLayoutWidget_3)
+        self.yawOriSpinBox.setObjectName(u"yawOriSpinBox")
+        self.yawOriSpinBox.setMinimum(-360.000000000000000)
+        self.yawOriSpinBox.setMaximum(360.000000000000000)
 
-        self.formLayout.setWidget(2, QFormLayout.FieldRole, self.zCurOriLineEdit)
-
-        self.wCurOriLabel = QLabel(self.formLayoutWidget_3)
-        self.wCurOriLabel.setObjectName(u"wCurOriLabel")
-        self.wCurOriLabel.setMinimumSize(QSize(20, 30))
-
-        self.formLayout.setWidget(3, QFormLayout.LabelRole, self.wCurOriLabel)
-
-        self.wCurOriLineEdit = QLineEdit(self.formLayoutWidget_3)
-        self.wCurOriLineEdit.setObjectName(u"wCurOriLineEdit")
-
-        self.formLayout.setWidget(3, QFormLayout.FieldRole, self.wCurOriLineEdit)
+        self.formLayout.setWidget(2, QFormLayout.FieldRole, self.yawOriSpinBox)
 
         self.label = QLabel(Dialog)
         self.label.setObjectName(u"label")
-        self.label.setGeometry(QRect(20, 80, 67, 17))
+        self.label.setGeometry(QRect(20, 80, 161, 17))
         self.label_2 = QLabel(Dialog)
         self.label_2.setObjectName(u"label_2")
-        self.label_2.setGeometry(QRect(200, 80, 91, 17))
+        self.label_2.setGeometry(QRect(200, 80, 161, 17))
         self.IKEnableBtn = QPushButton(Dialog)
         self.IKEnableBtn.setObjectName(u"IKEnableBtn")
         self.IKEnableBtn.setEnabled(True)
@@ -196,7 +197,7 @@ class Ui_Dialog(object):
         __qtablewidgetitem17 = QTableWidgetItem()
         self.iter_table.setVerticalHeaderItem(16, __qtablewidgetitem17)
         self.iter_table.setObjectName(u"iter_table")
-        self.iter_table.setGeometry(QRect(20, 260, 531, 541))
+        self.iter_table.setGeometry(QRect(20, 300, 531, 541))
         self.iter_table.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.iter_table.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.iter_table.verticalHeader().setStretchLastSection(True)
@@ -206,6 +207,21 @@ class Ui_Dialog(object):
         self.getPoseBtn = QPushButton(Dialog)
         self.getPoseBtn.setObjectName(u"getPoseBtn")
         self.getPoseBtn.setGeometry(QRect(390, 40, 161, 31))
+        self.posTolSpinBox = QDoubleSpinBox(Dialog)
+        self.posTolSpinBox.setObjectName(u"posTolSpinBox")
+        self.posTolSpinBox.setGeometry(QRect(40, 240, 131, 26))
+        self.posTolSpinBox.setValue(5.000000000000000)
+        self.label_4 = QLabel(Dialog)
+        self.label_4.setObjectName(u"label_4")
+        self.label_4.setGeometry(QRect(20, 220, 151, 17))
+        self.oriTolSpinBox = QDoubleSpinBox(Dialog)
+        self.oriTolSpinBox.setObjectName(u"oriTolSpinBox")
+        self.oriTolSpinBox.setGeometry(QRect(220, 240, 131, 26))
+        self.oriTolSpinBox.setSingleStep(0.100000000000000)
+        self.oriTolSpinBox.setValue(10.000000000000000)
+        self.label_5 = QLabel(Dialog)
+        self.label_5.setObjectName(u"label_5")
+        self.label_5.setGeometry(QRect(200, 220, 151, 17))
 
         self.retranslateUi(Dialog)
 
@@ -217,12 +233,12 @@ class Ui_Dialog(object):
         self.xLabel.setText(QCoreApplication.translate("Dialog", u"x", None))
         self.yLabel.setText(QCoreApplication.translate("Dialog", u"y", None))
         self.zLabel.setText(QCoreApplication.translate("Dialog", u"z", None))
-        self.xCurOriLabel.setText(QCoreApplication.translate("Dialog", u"x", None))
-        self.yCurOriLabel.setText(QCoreApplication.translate("Dialog", u"y", None))
-        self.zCurOriLabel.setText(QCoreApplication.translate("Dialog", u"z", None))
-        self.wCurOriLabel.setText(QCoreApplication.translate("Dialog", u"w", None))
-        self.label.setText(QCoreApplication.translate("Dialog", u"Position", None))
-        self.label_2.setText(QCoreApplication.translate("Dialog", u"Orientation", None))
+        self.xPosSpinBox.setSuffix("")
+        self.rollLabel.setText(QCoreApplication.translate("Dialog", u"r", None))
+        self.pitchLabel.setText(QCoreApplication.translate("Dialog", u"p", None))
+        self.yawLabel.setText(QCoreApplication.translate("Dialog", u"y", None))
+        self.label.setText(QCoreApplication.translate("Dialog", u"Position [mm]", None))
+        self.label_2.setText(QCoreApplication.translate("Dialog", u"Orientation [deg]", None))
         self.IKEnableBtn.setText("")
         self.label_3.setText(QCoreApplication.translate("Dialog", u"IK mode\n"
 "Enabled", None))
@@ -266,5 +282,7 @@ class Ui_Dialog(object):
         ___qtablewidgetitem17.setText(QCoreApplication.translate("Dialog", u"time", None));
         self.plan_status_label.setText(QCoreApplication.translate("Dialog", u"status: NOT PLANNED", None))
         self.getPoseBtn.setText(QCoreApplication.translate("Dialog", u"Get Current Pose", None))
+        self.label_4.setText(QCoreApplication.translate("Dialog", u"Position Tolerance", None))
+        self.label_5.setText(QCoreApplication.translate("Dialog", u"Orientation Tolerance", None))
     # retranslateUi
 

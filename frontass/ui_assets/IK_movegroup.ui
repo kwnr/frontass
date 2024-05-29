@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>754</width>
+    <height>599</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>movegroup</string>
+  </property>
+  <widget class="QPushButton" name="ikEnableBtn">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>680</x>
+     <y>30</y>
+     <width>41</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>41</width>
+     <height>21</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>16777215</height>
+    </size>
+   </property>
+   <property name="baseSize">
+    <size>
+     <width>41</width>
+     <height>21</height>
+    </size>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{
+	background-color: none;
+	border-radius: 3%;
+}</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset resource="buttons.qrc">
+     <normaloff>:/toggle/off</normaloff>
+     <normalon>:/toggle/on</normalon>:/toggle/off</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>41</width>
+     <height>40</height>
+    </size>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="flat">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="ikLabel">
+   <property name="geometry">
+    <rect>
+     <x>570</x>
+     <y>30</y>
+     <width>91</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>IK mode
+Enabled</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="planBtn">
+   <property name="geometry">
+    <rect>
+     <x>570</x>
+     <y>80</y>
+     <width>161</width>
+     <height>50</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>PLAN</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="execBtn">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>570</x>
+     <y>140</y>
+     <width>161</width>
+     <height>50</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>EXECUTE</string>
+   </property>
+  </widget>
+  <widget class="QTableWidget" name="iterTable">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>30</y>
+     <width>531</width>
+     <height>541</height>
+    </rect>
+   </property>
+   <property name="verticalScrollBarPolicy">
+    <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+   </property>
+   <property name="horizontalScrollBarPolicy">
+    <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+   </property>
+   <attribute name="verticalHeaderStretchLastSection">
+    <bool>true</bool>
+   </attribute>
+   <row>
+    <property name="text">
+     <string>L1</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>L2</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>L3</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>L4</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>L5</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>L6</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>L7</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>L8</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>R1</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>R2</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>R3</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>R4</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>R5</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>R6</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>R7</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>R8</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>time</string>
+    </property>
+   </row>
+   <column>
+    <property name="text">
+     <string>Position</string>
+    </property>
+   </column>
+  </widget>
+  <widget class="QLabel" name="planStatusLabel">
+   <property name="geometry">
+    <rect>
+     <x>570</x>
+     <y>200</y>
+     <width>171</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>status: NOT PLANNED</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="loopCheckBox">
+   <property name="geometry">
+    <rect>
+     <x>570</x>
+     <y>240</y>
+     <width>151</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Loop Trajectory</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="saveTrajBtn">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>570</x>
+     <y>520</y>
+     <width>161</width>
+     <height>50</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Save Trajectory</string>
+   </property>
+  </widget>
+ </widget>
+ <resources>
+  <include location="buttons.qrc"/>
+ </resources>
+ <connections/>
+</ui>

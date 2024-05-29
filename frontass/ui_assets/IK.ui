@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>568</width>
-    <height>830</height>
+    <height>879</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,9 +36,6 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="1">
-     <widget class="QLineEdit" name="xCurPosLineEdit"/>
-    </item>
     <item row="1" column="0">
      <widget class="QLabel" name="yLabel">
       <property name="minimumSize">
@@ -51,9 +48,6 @@
        <string>y</string>
       </property>
      </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QLineEdit" name="yCurPosLineEdit"/>
     </item>
     <item row="2" column="0">
      <widget class="QLabel" name="zLabel">
@@ -68,8 +62,38 @@
       </property>
      </widget>
     </item>
+    <item row="0" column="1">
+     <widget class="QDoubleSpinBox" name="xPosSpinBox">
+      <property name="suffix">
+       <string/>
+      </property>
+      <property name="minimum">
+       <double>-999.990000000000009</double>
+      </property>
+      <property name="maximum">
+       <double>999.990000000000009</double>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QDoubleSpinBox" name="yPosSpinBox">
+      <property name="minimum">
+       <double>-999.990000000000009</double>
+      </property>
+      <property name="maximum">
+       <double>999.990000000000009</double>
+      </property>
+     </widget>
+    </item>
     <item row="2" column="1">
-     <widget class="QLineEdit" name="zCurPosLineEdit"/>
+     <widget class="QDoubleSpinBox" name="zPosSpinBox">
+      <property name="minimum">
+       <double>-999.990000000000009</double>
+      </property>
+      <property name="maximum">
+       <double>999.990000000000009</double>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -79,12 +103,12 @@
      <x>200</x>
      <y>100</y>
      <width>160</width>
-     <height>140</height>
+     <height>111</height>
     </rect>
    </property>
    <layout class="QFormLayout" name="formLayout">
     <item row="0" column="0">
-     <widget class="QLabel" name="xCurOriLabel">
+     <widget class="QLabel" name="rollLabel">
       <property name="minimumSize">
        <size>
         <width>20</width>
@@ -92,15 +116,25 @@
        </size>
       </property>
       <property name="text">
-       <string>x</string>
+       <string>r</string>
       </property>
      </widget>
     </item>
-    <item row="0" column="1">
-     <widget class="QLineEdit" name="xCurOriLineEdit"/>
-    </item>
     <item row="1" column="0">
-     <widget class="QLabel" name="yCurOriLabel">
+     <widget class="QLabel" name="pitchLabel">
+      <property name="minimumSize">
+       <size>
+        <width>20</width>
+        <height>30</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>p</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="yawLabel">
       <property name="minimumSize">
        <size>
         <width>20</width>
@@ -112,40 +146,35 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="1">
-     <widget class="QLineEdit" name="yCurOriLineEdit"/>
-    </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="zCurOriLabel">
-      <property name="minimumSize">
-       <size>
-        <width>20</width>
-        <height>30</height>
-       </size>
+    <item row="0" column="1">
+     <widget class="QDoubleSpinBox" name="rollOriSpinBox">
+      <property name="minimum">
+       <double>-360.000000000000000</double>
       </property>
-      <property name="text">
-       <string>z</string>
+      <property name="maximum">
+       <double>360.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QDoubleSpinBox" name="pitchOriSpinBox">
+      <property name="minimum">
+       <double>-360.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>360.000000000000000</double>
       </property>
      </widget>
     </item>
     <item row="2" column="1">
-     <widget class="QLineEdit" name="zCurOriLineEdit"/>
-    </item>
-    <item row="3" column="0">
-     <widget class="QLabel" name="wCurOriLabel">
-      <property name="minimumSize">
-       <size>
-        <width>20</width>
-        <height>30</height>
-       </size>
+     <widget class="QDoubleSpinBox" name="yawOriSpinBox">
+      <property name="minimum">
+       <double>-360.000000000000000</double>
       </property>
-      <property name="text">
-       <string>w</string>
+      <property name="maximum">
+       <double>360.000000000000000</double>
       </property>
      </widget>
-    </item>
-    <item row="3" column="1">
-     <widget class="QLineEdit" name="wCurOriLineEdit"/>
     </item>
    </layout>
   </widget>
@@ -154,12 +183,12 @@
     <rect>
      <x>20</x>
      <y>80</y>
-     <width>67</width>
+     <width>161</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
-    <string>Position</string>
+    <string>Position [mm]</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">
@@ -167,12 +196,12 @@
     <rect>
      <x>200</x>
      <y>80</y>
-     <width>91</width>
+     <width>161</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
-    <string>Orientation</string>
+    <string>Orientation [deg]</string>
    </property>
   </widget>
   <widget class="QPushButton" name="IKEnableBtn">
@@ -288,7 +317,7 @@ Enabled</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>260</y>
+     <y>300</y>
      <width>531</width>
      <height>541</height>
     </rect>
@@ -417,6 +446,74 @@ Enabled</string>
    </property>
    <property name="text">
     <string>Get Current Pose</string>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="posTolSpinBox">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>240</y>
+     <width>131</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="value">
+    <double>5.000000000000000</double>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>220</y>
+     <width>151</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Position Tolerance</string>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="oriTolSpinBox">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>240</y>
+     <width>131</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="singleStep">
+    <double>0.100000000000000</double>
+   </property>
+   <property name="value">
+    <double>10.000000000000000</double>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>220</y>
+     <width>151</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Orientation Tolerance</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>40</y>
+     <width>161</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Linear Path</string>
    </property>
   </widget>
  </widget>

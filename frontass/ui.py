@@ -19,6 +19,7 @@ from ui_pump_config_diag import UIPumpConfigDiag
 from ui_preset_diag import UIPresetDiag
 from ui_pose_iterator import UIPoseIterator
 from ui_moveit import UIMoveit
+from ui_movegroup import UIMoveGroup
 from utils import BlitManager
 
 import rclpy
@@ -34,6 +35,7 @@ import numpy as np
 import nmcli
 
 from subprocess import Popen, PIPE
+import signal
 
 from matplotlib.backends.backend_qtagg import FigureCanvas
 from matplotlib.figure import Figure
@@ -518,24 +520,24 @@ class UI(QMainWindow, Ui_MainWindow):
         self.arm_graph_tool_btn.clicked.connect(self.fig_sel_diag.show)
         self.fig_sel_diag.checkbox_state = np.zeros((6, 16)).astype(bool)
 
-        self.ik_diag = UIMoveit(self)
+        self.ik_diag = UIMoveGroup(self, node=self.node)
         self.ik_mode_btn.clicked.connect(self.ik_diag.show)
         self.joint_state_publisher = self.node.create_publisher(
             JointState, "joint_states", qos_profile_system_default
         )
-        self.ik_diag.ik_traj_timer.timeout.connect(lambda: self.ik_diag.traj_timer_cb(self.joint_pos))
-        self.ik_diag.ik_pos_timer.timeout.connect(lambda: self.ik_diag.pos_timer_cb(self.joint_pos))
 
-        self.ik_mode_btn.clicked.connect(self.ik_diag.ik_pos_timer.start)
-        self.ik_diag.finished.connect(self.ik_diag.ik_pos_timer.stop)
+        self.ik_diag.timer_robot_position.timeout.connect(lambda: self.ik_diag.cb_movegroup(self.joint_pos))
+
+        self.ik_mode_btn.clicked.connect(self.ik_diag.timer_robot_position.start)
+        self.ik_diag.finished.connect(self.ik_diag.timer_robot_position.stop)
         self.ik_diag.ik_traj_pos_changed.connect(self.publish_pose_override)
 
-        self.preset_diag.enable_preset_mode_btn.clicked.connect(lambda: self.ik_diag.IKEnableBtn.setChecked(False))
+        self.preset_diag.enable_preset_mode_btn.clicked.connect(lambda: self.ik_diag.ikEnableBtn.setChecked(False))
         self.preset_diag.enable_preset_mode_btn.clicked.connect(lambda: self.pose_iteration_diag.enabled_btn.setChecked(False))
         self.pose_iteration_diag.enabled_btn.clicked.connect(lambda: self.preset_diag.enable_preset_mode_btn.setChecked(False))
-        self.pose_iteration_diag.enabled_btn.clicked.connect(lambda: self.ik_diag.IKEnableBtn.setChecked(False))
-        self.ik_diag.IKEnableBtn.clicked.connect(lambda: self.preset_diag.enable_preset_mode_btn.setChecked(False))
-        self.ik_diag.IKEnableBtn.clicked.connect(lambda: self.pose_iteration_diag.enabled_btn.setChecked(False))
+        self.pose_iteration_diag.enabled_btn.clicked.connect(lambda: self.ik_diag.ikEnableBtn.setChecked(False))
+        self.ik_diag.ikEnableBtn.clicked.connect(lambda: self.preset_diag.enable_preset_mode_btn.setChecked(False))
+        self.ik_diag.ikEnableBtn.clicked.connect(lambda: self.pose_iteration_diag.enabled_btn.setChecked(False))
 
         self.th_spin = Thread(target=rclpy.spin, kwargs={"node": self.node})
         self.th_spin.start()
@@ -678,9 +680,11 @@ class UI(QMainWindow, Ui_MainWindow):
             client_conn_text = client_conn.signal
         else:
             client_conn_text = "Not Connected" """
-        p = Popen(["ping", "-c1", "192.168.0.3"], stdout=PIPE, stdin=PIPE)
+        """p = Popen(["ping", "-c1", "192.168.0.3"], stdout=PIPE, stdin=PIPE)
         res = p.communicate()
-        self.ping_text.setText(res[0].decode().split('time=')[1].split('\n')[0][:-3]+" ms")
+        res = res[0].decode()
+        if 'time=' in res:
+            self.ping_text.setText(res[0].split('time=')[1].split('\n')[0][:-3]+" ms")"""
         # self.client_conn_text.setText(f"{client_conn_text}")
         self.read_rate_text.setText(f"{self.freq_read:.2f} Hz")
         self.cmd_rate_text.setText(f"{self.freq_cmd:.2f} Hz")
@@ -787,12 +791,11 @@ class UI(QMainWindow, Ui_MainWindow):
 
 
 def main():
-    rclpy.init(domain_id=0)
+    rclpy.init(domain_id=1)
     app = QApplication()
     w = UI()
     w.show()
     app.exec()
-    app.lastWindowClosed.connect(w.ik_diag.armstrong.shutdown)
 
 
 if __name__ == "__main__":

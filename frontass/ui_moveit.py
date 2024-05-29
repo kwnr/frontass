@@ -5,13 +5,16 @@ from ui_assets.ik_ui import Ui_Dialog
 
 from moveit.core.robot_state import RobotState
 from moveit.core.planning_scene import PlanningScene
-from ament_index_python import get_package_share_directory
-
-from moveit.planning import MoveItPy, MultiPipelinePlanRequestParameters
+from moveit.core.kinematic_constraints import construct_joint_constraint, construct_link_constraint
+from moveit.planning import MoveItPy, MultiPipelinePlanRequestParameters, PlanRequestParameters
 from moveit_configs_utils import MoveItConfigsBuilder
+
+from ament_index_python import get_package_share_directory
 
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import PoseStamped
+
+from scipy.spatial.transform import Rotation
 
 import numpy as np
 import pandas as pd
@@ -22,19 +25,41 @@ class UIMoveit(QDialog, Ui_Dialog):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
+        path_to_moveit_config_pkg = get_package_share_directory("armstrong_moveit_config")
         moveit_config_builder = MoveItConfigsBuilder("armstrong")
-        moveit_config_builder.moveit_cpp(
-            file_path=get_package_share_directory("armstrong_moveit_config")+"/config/moveit_cpp.yaml"
-            ).joint_limits(
-            file_path=get_package_share_directory("armstrong_moveit_config")
-            + "/config/joint_limits.yaml"
-        )
-        self.armstrong = MoveItPy(
-            node_name="moveit_py", config_dict=moveit_config_builder.to_dict()
-        )
-        self.moveit_arm = self.armstrong.get_planning_component("right_arm")
-        self.arm_model = self.armstrong.get_robot_model()
-        self.planning_scene_monitor = self.armstrong.get_planning_scene_monitor()
+        moveit_config = (
+            moveit_config_builder
+            .robot_description(
+                file_path=path_to_moveit_config_pkg+"/config/armstrong_urdf_v11.urdf.xacro"
+            )
+            .robot_description_semantic(
+                file_path=path_to_moveit_config_pkg+"/config/armstrong_urdf_v11.srdf"
+            )
+            .planning_scene_monitor(
+                publish_robot_description=True,
+                publish_robot_description_semantic=True
+            )
+            .joint_limits(
+                file_path=path_to_moveit_config_pkg+"/config/joint_limits.yaml"
+            )
+            .pilz_cartesian_limits(
+                file_path=path_to_moveit_config_pkg+"/config/pilz_cartesian_limits.yaml"
+            )
+            .planning_pipelines(
+                pipelines=["ompl", "chomp", "pilz_industrial_motion_planner"]
+            )
+            ).to_moveit_configs()
+
+        moveit_config = (
+            moveit_config_builder
+            .moveit_cpp(
+                file_path=path_to_moveit_config_pkg+"/config/moveit_cpp.yaml")
+            .joint_limits(file_path=path_to_moveit_config_pkg+"/config/joint_limits.yaml"))
+
+        self.moveit_py = MoveItPy(node_name="moveit_py", config_dict=moveit_config.to_dict())
+        self.moveit_arm = self.moveit_py.get_planning_component("right_arm")
+        self.arm_model = self.moveit_py.get_robot_model()
+        self.planning_scene_monitor = self.moveit_py.get_planning_scene_monitor()
         self.arm_state = RobotState(self.arm_model)
 
         self.ik_enabled = False
@@ -55,6 +80,12 @@ class UIMoveit(QDialog, Ui_Dialog):
         self.ik_traj_timer = QTimer(self)
         self.ik_traj_timer.setInterval(10)
 
+        self.plan_request_params = PlanRequestParameters(self.moveit_py, "pilz_lin")
+
+        self.multi_pipeline_plan_request_params = MultiPipelinePlanRequestParameters(
+            self.moveit_py, ['ompl_rrtc', 'pilz_lin', 'chomp_planner']
+        )
+
     def set_ik_enabled(self, val):
         self.ik_enabled = val
         if val:
@@ -67,30 +98,32 @@ class UIMoveit(QDialog, Ui_Dialog):
             robot_state = scene.current_state
             pose = robot_state.get_pose("goal_right")
 
-        self.xCurPosLineEdit.setText(f"{pose.position.x:.4f}")
-        self.yCurPosLineEdit.setText(f"{pose.position.y:.4f}")
-        self.zCurPosLineEdit.setText(f"{pose.position.z:.4f}")
+        r, p, y = Rotation([pose.orientation.x,
+                            pose.orientation.y,
+                            pose.orientation.z,
+                            pose.orientation.w]).as_euler('xyz', True)
 
-        self.xCurOriLineEdit.setText(f"{pose.orientation.x:.4f}")
-        self.yCurOriLineEdit.setText(f"{pose.orientation.y:.4f}")
-        self.zCurOriLineEdit.setText(f"{pose.orientation.z:.4f}")
-        self.wCurOriLineEdit.setText(f"{pose.orientation.w:.4f}")
+        self.xPosSpinBox.setValue(pose.position.x * 1000)
+        self.yPosSpinBox.setValue(pose.position.y * 1000)
+        self.zPosSpinBox.setValue(pose.position.z * 1000)
+
+        self.rollOriSpinBox.setValue(r)
+        self.pitchOriSpinBox.setValue(p)
+        self.yawOriSpinBox.setValue(y)
+
+    def get_tolerance(self):
+        pos_tol = self.posTolSpinBox.value() / 1000
+        ori_tol = np.deg2rad(self.oriTolSpinBox.value())
+        return pos_tol, ori_tol
 
     def plan(self):
         self.moveit_arm.set_start_state_to_current_state()
-        goal = PoseStamped()
-        goal.header.frame_id = "base_link_right"
+        x, y, z, quat = self.get_tgt_pose()
+        pos_tol, ori_tol = self.get_tolerance()
 
-        goal.pose.position.x = float(self.xCurPosLineEdit.text())
-        goal.pose.position.y = float(self.yCurPosLineEdit.text())
-        goal.pose.position.z = float(self.zCurPosLineEdit.text())
-
-        goal.pose.orientation.x = float(self.xCurOriLineEdit.text())
-        goal.pose.orientation.y = float(self.yCurOriLineEdit.text())
-        goal.pose.orientation.z = float(self.zCurOriLineEdit.text())
-        goal.pose.orientation.w = float(self.wCurOriLineEdit.text())
-
-        self.moveit_arm.set_goal_state(pose_stamped_msg=goal, pose_link="goal_right")
+        goal = construct_link_constraint("goal_right", "base_link_right", [x, y, z], pos_tol, quat.tolist(), ori_tol)
+        print(goal)
+        self.moveit_arm.set_goal_state(motion_plan_constraints=[goal])
         plan_result = self.moveit_arm.plan()
         if plan_result:
             self.plan_status_label.setText("status: PLANNED")
@@ -116,7 +149,9 @@ class UIMoveit(QDialog, Ui_Dialog):
 
     def build_df(self, positions, nanosecs):
         point = np.rad2deg(positions)
-        self.pose_df = pd.DataFrame(index=[f'L{i}' for i in range(1,9)]+[f'R{i}' for i in range(1,9)]+["time"], columns=[str(i) for i, p in enumerate(point)])
+        self.pose_df = pd.DataFrame(
+            index=[f'L{i}' for i in range(1,9)]+[f'R{i}' for i in range(1,9)]+["time"],
+            columns=[str(i) for i, p in enumerate(point)])
         self.pose_df.iloc[8:14] = np.rad2deg(positions).T
         self.pose_df.iloc[16] = nanosecs
         return self.pose_df
@@ -143,6 +178,17 @@ class UIMoveit(QDialog, Ui_Dialog):
         self.iter_table.setHorizontalHeaderLabels(
             ["position", *pose_df.columns.astype(str)]
         )
+
+    def get_tgt_pose(self):
+        x = self.xPosSpinBox.value() / 1000
+        y = self.yPosSpinBox.value() / 1000
+        z = self.zPosSpinBox.value() / 1000
+        roll = self.rollOriSpinBox.value()
+        pitch = self.pitchOriSpinBox.value()
+        yaw = self.yawOriSpinBox.value()
+
+        quat = Rotation.from_euler('xyz', [roll, pitch, yaw], degrees=True).as_quat()
+        return (x, y, z, quat)
 
     def update_pos_col(self, pos: np.ndarray):
         for i, p in enumerate(pos):
