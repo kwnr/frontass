@@ -47,7 +47,7 @@ from matplotlib import color_sequences
 class UI(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        self.node = Node("assui")
+        self.node = Node("assui_kwnr")
 
         self.setupUi(self)
 
@@ -63,6 +63,8 @@ class UI(QMainWindow, Ui_MainWindow):
         self.ui_action_pub = self.node.create_publisher(
             UIAction, "ui_action", qos_profile_system_default
         )
+        self.th_spin = Thread(target=rclpy.spin, kwargs={"node": self.node})
+        self.th_spin.start()
 
         # ui properties
         # should be list to be a mutable
@@ -538,9 +540,6 @@ class UI(QMainWindow, Ui_MainWindow):
         self.pose_iteration_diag.enabled_btn.clicked.connect(lambda: self.ik_diag.ikEnableBtn.setChecked(False))
         self.ik_diag.ikEnableBtn.clicked.connect(lambda: self.preset_diag.enable_preset_mode_btn.setChecked(False))
         self.ik_diag.ikEnableBtn.clicked.connect(lambda: self.pose_iteration_diag.enabled_btn.setChecked(False))
-
-        self.th_spin = Thread(target=rclpy.spin, kwargs={"node": self.node})
-        self.th_spin.start()
 
     def publish_pose_override(self, value):
         message = PoseIteration()

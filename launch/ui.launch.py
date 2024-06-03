@@ -1,9 +1,9 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from moveit_configs_utils import MoveItConfigsBuilder
-from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
-from launch_ros.substitutions import FindPackageShare
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+
 from ament_index_python.packages import get_package_share_directory
 
 import os
@@ -23,7 +23,7 @@ def generate_launch_description():
         .trajectory_execution(file_path="config/moveit_controllers.yaml")
         .planning_scene_monitor(publish_robot_description=True,
                                 publish_robot_description_semantic=True)
-        .planning_pipelines(pipelines=['ompl', 'chomp', 'pilz_industrial_motion_planner'])
+        .planning_pipelines(pipelines=['ompl', 'pilz_industrial_motion_planner'])
         .to_moveit_configs()
         )
     movegroup_node = Node(package='moveit_ros_move_group',
@@ -56,12 +56,17 @@ def generate_launch_description():
         output="log",
         arguments=["--frame-id", "world","--child-frame-id", "base_link_right"],
     )
-    robot_state_publisher = Node(
+    """robot_state_publisher = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
         name="robot_state_publisher",
         output="both",
         parameters=[moveit_config.robot_description],
+    )"""
+    robot_state_publisher = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [get_package_share_directory("armstrong_moveit_config"), '/launch/rsp.launch.py']
+        )
     )
 
 

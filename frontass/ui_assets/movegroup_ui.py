@@ -15,9 +15,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QDialog, QHeaderView,
-    QLabel, QPushButton, QSizePolicy, QTableWidget,
-    QTableWidgetItem, QWidget)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog,
+    QHeaderView, QLabel, QPushButton, QSizePolicy,
+    QTableWidget, QTableWidgetItem, QWidget)
 import buttons_rc
 
 class Ui_Dialog(object):
@@ -52,9 +52,6 @@ class Ui_Dialog(object):
         self.ikLabel = QLabel(Dialog)
         self.ikLabel.setObjectName(u"ikLabel")
         self.ikLabel.setGeometry(QRect(570, 30, 91, 41))
-        self.planBtn = QPushButton(Dialog)
-        self.planBtn.setObjectName(u"planBtn")
-        self.planBtn.setGeometry(QRect(570, 80, 161, 50))
         self.execBtn = QPushButton(Dialog)
         self.execBtn.setObjectName(u"execBtn")
         self.execBtn.setEnabled(False)
@@ -110,11 +107,28 @@ class Ui_Dialog(object):
         self.planStatusLabel.setGeometry(QRect(570, 200, 171, 17))
         self.loopCheckBox = QCheckBox(Dialog)
         self.loopCheckBox.setObjectName(u"loopCheckBox")
+        self.loopCheckBox.setEnabled(False)
         self.loopCheckBox.setGeometry(QRect(570, 240, 151, 23))
         self.saveTrajBtn = QPushButton(Dialog)
         self.saveTrajBtn.setObjectName(u"saveTrajBtn")
-        self.saveTrajBtn.setEnabled(False)
+        self.saveTrajBtn.setEnabled(True)
         self.saveTrajBtn.setGeometry(QRect(570, 520, 161, 50))
+        self.planningPipelineCombo = QComboBox(Dialog)
+        self.planningPipelineCombo.setObjectName(u"planningPipelineCombo")
+        self.planningPipelineCombo.setGeometry(QRect(570, 290, 161, 25))
+        self.plannerIDCombo = QComboBox(Dialog)
+        self.plannerIDCombo.setObjectName(u"plannerIDCombo")
+        self.plannerIDCombo.setGeometry(QRect(570, 350, 161, 25))
+        self.planStatusLabel_2 = QLabel(Dialog)
+        self.planStatusLabel_2.setObjectName(u"planStatusLabel_2")
+        self.planStatusLabel_2.setGeometry(QRect(570, 270, 171, 17))
+        self.planStatusLabel_3 = QLabel(Dialog)
+        self.planStatusLabel_3.setObjectName(u"planStatusLabel_3")
+        self.planStatusLabel_3.setGeometry(QRect(570, 330, 171, 17))
+        self.planBtn = QPushButton(Dialog)
+        self.planBtn.setObjectName(u"planBtn")
+        self.planBtn.setEnabled(True)
+        self.planBtn.setGeometry(QRect(570, 80, 161, 50))
 
         self.retranslateUi(Dialog)
 
@@ -126,7 +140,6 @@ class Ui_Dialog(object):
         self.ikEnableBtn.setText("")
         self.ikLabel.setText(QCoreApplication.translate("Dialog", u"IK mode\n"
 "Enabled", None))
-        self.planBtn.setText(QCoreApplication.translate("Dialog", u"PLAN", None))
         self.execBtn.setText(QCoreApplication.translate("Dialog", u"EXECUTE", None))
         ___qtablewidgetitem = self.iterTable.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("Dialog", u"Position", None));
@@ -167,5 +180,8 @@ class Ui_Dialog(object):
         self.planStatusLabel.setText(QCoreApplication.translate("Dialog", u"status: NOT PLANNED", None))
         self.loopCheckBox.setText(QCoreApplication.translate("Dialog", u"Loop Trajectory", None))
         self.saveTrajBtn.setText(QCoreApplication.translate("Dialog", u"Save Trajectory", None))
+        self.planStatusLabel_2.setText(QCoreApplication.translate("Dialog", u"Planning Pipeline", None))
+        self.planStatusLabel_3.setText(QCoreApplication.translate("Dialog", u"Planner ID", None))
+        self.planBtn.setText(QCoreApplication.translate("Dialog", u"PLAN", None))
     # retranslateUi
 
