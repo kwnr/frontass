@@ -18,7 +18,6 @@ from ui_fig_select_diag import UIFigSelectDiag
 from ui_pump_config_diag import UIPumpConfigDiag
 from ui_preset_diag import UIPresetDiag
 from ui_pose_iterator import UIPoseIterator
-from ui_moveit import UIMoveit
 from ui_movegroup import UIMoveGroup
 from utils import BlitManager
 

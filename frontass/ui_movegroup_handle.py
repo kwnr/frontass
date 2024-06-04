@@ -10,7 +10,7 @@ from rclpy.qos import qos_profile_system_default
 
 from std_msgs.msg import Header
 from sensor_msgs.msg import JointState
-from trajectory_msgs.msg import JointTrajectoryPoint
+from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from moveit_msgs.msg import (DisplayTrajectory,
                              RobotTrajectory,
                              MotionPlanRequest,
@@ -54,10 +54,6 @@ class UIMoveGroup(QDialog, Ui_Dialog):
         self.node: Node = kwargs.get('node')
         self.sub_traj = self.node.create_subscription(DisplayTrajectory, '/display_planned_path', self.cb_sub_traj, 10)
         self.pub_traj = self.node.create_publisher(DisplayTrajectory, '/display_planned_path', 10)
-
-        self.srv_get_interactive_marker = self.node.create_client(GetInteractiveMarkers,
-                                '/rviz_moveit_motion_planning_display/robot_interaction_interactive_marker_topic/get_interactive_markers')
-        self.srv_get_motion_plan = self.node.create_client(GetMotionPlan, '/plan_kinematic_path')
 
         self.srv_get_planning_scene = self.node.create_client(GetPlanningScene, '/get_planning_scene')
         self.sub_joint_state = self.node.create_subscription(JointState, '/joint_states', self.cb_sub_joint_state, 10)
@@ -166,39 +162,9 @@ class UIMoveGroup(QDialog, Ui_Dialog):
         QFileDialog.saveFileContent(self.pose_df, '', self)
 
     def plan(self):
-        result = self.srv_get_interactive_marker.call(GetInteractiveMarkers.Request())
-        marker = result.markers[0]
+        result: RequestPlan.Response= self.srv_req_plan.call(RequestPlan.Request())
+        result = result.response
 
-        result = self.srv_get_planning_scene.call(GetPlanningScene.Request(compunents=2))
-
-        marker_position = [marker.pose.position.x,
-                           marker.pose.position.y,
-                           marker.pose.position.z]
-        marker_orientation = [
-            marker.pose.orientation.x,
-            marker.pose.orientation.y,
-            marker.pose.orientation.z,
-            marker.pose.orientation.w,
-        ]
-        pipeline_id, planner_id = self.get_planning_request_params()
-
-        goal_constraint = construct_link_constraint('link6_right',
-                                                    source_frame='base_link_right',
-                                                    cartesian_position=marker_position,
-                                                    cartesian_position_tolerance=0.01,
-                                                    orientation=marker_orientation,
-                                                    orientation_tolerance=0.01)
-
-        motion_plan_request = self.build_motion_plan(pipeline_id,
-                                                     planner_id,
-                                                     self.robot_state,
-                                                     goal_constraint)
-
-        result = self.srv_get_motion_plan.call(
-            GetMotionPlan.Request(motion_plan_request=motion_plan_request)
-            )
-        result: MotionPlanResponse = result.motion_plan_response
-        print(result)
         if result.error_code.val == 1:
             self.trajectory = result.trajectory.joint_trajectory.points
             self.pub_traj.publish(
@@ -230,7 +196,7 @@ class UIMoveGroup(QDialog, Ui_Dialog):
         self.update_table(self.pose_df.iloc[:, idx:])
         message.enabled = self.ik_enabled
         message.point = self.trajectory[idx]
-        self.traj_point_publisher.publish(message)
+        self.pose_iter_publisher.publish(message)
 
     def cb_execution(self):
         if self.time_exec_started is None:
@@ -255,7 +221,7 @@ class UIMoveGroup(QDialog, Ui_Dialog):
             time_passed = time_passed = time.time_ns() - time_at_point
             message.enabled = self.ik_enabled
             message.poses = interpolated
-            self.traj_point_publisher.publish(message)
+            self.pose_iter_publisher.publish(message)
 
         latest_pos = self.pose_df.pop(self.pose_df.columns[0])
         if self.loopCheckBox.isChecked():
