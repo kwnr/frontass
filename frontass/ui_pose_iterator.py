@@ -2,6 +2,7 @@ from PySide6.QtCore import QDir, QTimer
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QDialog, QFileDialog, QTableWidgetItem
 from ui_assets.pose_iterator_diag_ui import Ui_Dialog
+from ass_msgs.msg import PoseIteration
 
 import pandas as pd
 import numpy as np
@@ -18,7 +19,7 @@ class UIPoseIterator(QDialog, Ui_Dialog):
         self.tgt_pose = np.zeros(16)
         self.exec_time = 0
         self.wait_time = 0
-        self.trigger = 0
+        self.trigger = 0.
 
         self.pose_path_btn.clicked.connect(self.open_csv_file)
 
@@ -135,25 +136,30 @@ class UIPoseIterator(QDialog, Ui_Dialog):
                 self.traj_idx = 0
                 self.time_started = time.time()
                 self.publisher.publish(
-                    self.enabled_btn.isChecked(),
-                    self.trajectory[self.traj_idx],
-                    self.trigger,
+                    PoseIteration(
+                        enabled=self.enabled_btn.isChecked(),
+                        poses=self.trajectory[self.traj_idx],
+                        trigger=self.trigger,)
                 )
             elif not self.is_traj_completed:
                 if self.traj_idx < len(self.trajectory):
                     self.publisher.publish(
-                        self.enabled_btn.isChecked(),
-                        self.trajectory[self.traj_idx],
-                        self.trigger,
+                        PoseIteration(
+                            enabled=self.enabled_btn.isChecked(),
+                            poses=self.trajectory[self.traj_idx],
+                            trigger=self.trigger)
                     )
                     self.traj_idx = int(
-                        (time.time() - self.time_started)
-                        / self.exec_time
+                        (time.time() - self.time_started) / self.exec_time
                         * len(self.trajectory)
                     )
                 else:
                     self.publisher.publish(
-                        self.enabled_btn.isChecked(), self.trajectory[-1], self.trigger
+                        PoseIteration(
+                            enabled=self.enabled_btn.isChecked(),
+                            poses=self.trajectory[-1],
+                            trigger=self.trigger
+                            )
                     )
                     self.is_traj_completed = True
                     self.on_traj_exec = False
@@ -190,9 +196,12 @@ class UIPoseIterator(QDialog, Ui_Dialog):
 
     def publish(self):
         enabled = self.enabled_btn.isChecked()
-        print(self.trigger)
         self.publisher.publish(
-            enabled=enabled, poses=self.tgt_pose, trigger=self.trigger
+            PoseIteration(
+                enabled=enabled,
+                poses=self.tgt_pose,
+                trigger=self.trigger
+                )
         )
 
     def set_converge_criterion(self, val):

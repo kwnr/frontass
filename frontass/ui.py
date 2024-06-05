@@ -531,7 +531,7 @@ class UI(QMainWindow, Ui_MainWindow):
 
         self.ik_mode_btn.clicked.connect(self.ik_diag.timer_robot_position.start)
         self.ik_diag.finished.connect(self.ik_diag.timer_robot_position.stop)
-        self.ik_diag.ik_traj_pos_changed.connect(self.publish_pose_override)
+        # self.ik_diag.ik_traj_pos_changed.connect(self.publish_pose_override)
 
         self.preset_diag.enable_preset_mode_btn.clicked.connect(lambda: self.ik_diag.ikEnableBtn.setChecked(False))
         self.preset_diag.enable_preset_mode_btn.clicked.connect(lambda: self.pose_iteration_diag.enabled_btn.setChecked(False))
