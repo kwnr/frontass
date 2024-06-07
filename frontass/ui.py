@@ -24,6 +24,8 @@ from utils import BlitManager
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_system_default
+from rclpy.executors import MultiThreadedExecutor
+from rclpy.callback_groups import ReentrantCallbackGroup, MutuallyExclusiveCallbackGroup
 from ass_msgs.msg import Robot2UI, Hold, Preset, UIAction, PoseIteration
 from sensor_msgs.msg import JointState
 
@@ -50,20 +52,27 @@ class UI(QMainWindow, Ui_MainWindow):
 
         self.setupUi(self)
 
+        self.executer = MultiThreadedExecutor(16)
+        self.executer.add_node(self.node)
+        self.th_spin = Thread(target=self.executer.spin)
+        self.th_spin.start()
+
+        self.callback_group = ReentrantCallbackGroup()
+        self.mutex_callback_group = MutuallyExclusiveCallbackGroup()
+
         self.node.create_subscription(
             Robot2UI,
             "robot_to_ui",
             self.cb_subscribe_robot_state,
             qos_profile_system_default,
+            callback_group=self.mutex_callback_group
         )
         self.hold_pub = self.node.create_publisher(
-            Hold, "hold", qos_profile_system_default
+            Hold, "hold", qos_profile_system_default, callback_group=self.callback_group
         )
         self.ui_action_pub = self.node.create_publisher(
-            UIAction, "ui_action", qos_profile_system_default
+            UIAction, "ui_action", qos_profile_system_default, callback_group=self.callback_group
         )
-        self.th_spin = Thread(target=rclpy.spin, kwargs={"node": self.node})
-        self.th_spin.start()
 
         # ui properties
         # should be list to be a mutable
@@ -142,7 +151,7 @@ class UI(QMainWindow, Ui_MainWindow):
         self.preset_pos = np.zeros(16)
         self.preset_diag = UIPresetDiag(self)
         self.preset_pub = self.node.create_publisher(
-            Preset, "preset", qos_profile_system_default
+            Preset, "preset", qos_profile_system_default, callback_group=self.callback_group
         )
         self.preset_mode_btn.clicked.connect(self.preset_diag.show)
 
@@ -333,7 +342,7 @@ class UI(QMainWindow, Ui_MainWindow):
         self.pose_iter_timer = QTimer(self)
         self.pose_iter_timer.setInterval(10)
         self.pose_iter_publisher = self.node.create_publisher(
-            PoseIteration, "pose_iter", qos_profile_system_default
+            PoseIteration, "pose_iter", qos_profile_system_default, callback_group=self.callback_group
         )
         self.pose_iteration_diag = UIPoseIterator(self, self.pose_iter_publisher)
         self.start_pose_iteration_btn.clicked.connect(self.pose_iteration_diag.show)
@@ -521,10 +530,10 @@ class UI(QMainWindow, Ui_MainWindow):
         self.arm_graph_tool_btn.clicked.connect(self.fig_sel_diag.show)
         self.fig_sel_diag.checkbox_state = np.zeros((6, 16)).astype(bool)
 
-        self.ik_diag = UIMoveGroup(self, node=self.node)
+        self.ik_diag = UIMoveGroup(self, node=self.node, callback_group=self.callback_group)
         self.ik_mode_btn.clicked.connect(self.ik_diag.show)
         self.joint_state_publisher = self.node.create_publisher(
-            JointState, "joint_states", qos_profile_system_default
+            JointState, "joint_states", qos_profile_system_default, callback_group=self.mutex_callback_group
         )
 
         self.ik_diag.timer_robot_position.timeout.connect(lambda: self.ik_diag.cb_movegroup(self.joint_pos))

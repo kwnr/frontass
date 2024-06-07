@@ -11,7 +11,8 @@ setup(
     data_files=[
         ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
         (os.path.join('share', package_name), ['package.xml']),
-        (os.path.join('share', package_name, 'launch'), ['launch/ui.launch.py'])
+        (os.path.join('share', package_name, 'launch'), ['launch/ui.launch.py']),
+        (os.path.join('share', package_name, 'launch'), ['launch/ui_movegroup.launch.py'])
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -22,7 +23,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'ui = frontass.ui:main'
+            'ui = frontass.ui:main',
+            'movegroup_handle = frontass.node_movegroup:main'
         ],
     },
 )

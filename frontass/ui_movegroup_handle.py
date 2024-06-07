@@ -34,6 +34,8 @@ class UIMoveGroup(QDialog, Ui_Dialog):
         super().__init__(*args)
         self.setupUi(self)
 
+        self.robot_state = RobotState()
+        self.trajectory = RobotTrajectory()
         self.robot_position = np.zeros(16, dtype=float)
 
         self.ik_enabled = False
@@ -51,23 +53,27 @@ class UIMoveGroup(QDialog, Ui_Dialog):
         # set when execution started. if execution finished or not started, then set to None
         self.time_exec_started = None
 
-        self.node: Node = kwargs.get('node')
-        self.sub_traj = self.node.create_subscription(DisplayTrajectory, '/display_planned_path', self.cb_sub_traj, 10)
-        self.pub_traj = self.node.create_publisher(DisplayTrajectory, '/display_planned_path', 10)
+        self.node: Node = kwargs['node']
+        self.callback_group = kwargs['callback_group']
+        self.sub_traj = self.node.create_subscription(DisplayTrajectory, '/display_planned_path', self.cb_sub_traj, 10, callback_group=self.callback_group)
+        self.pub_traj = self.node.create_publisher(DisplayTrajectory, '/display_planned_path', 10, callback_group=self.callback_group)
 
         self.srv_get_planning_scene = self.node.create_client(GetPlanningScene, '/get_planning_scene')
-        self.sub_joint_state = self.node.create_subscription(JointState, '/joint_states', self.cb_sub_joint_state, 10)
-        self.srv_query_planner_interface = self.node.create_client(QueryPlannerInterfaces, '/query_planner_interface')
+        self.sub_joint_state = self.node.create_subscription(JointState, '/joint_states', self.cb_sub_joint_state, 10, callback_group=self.callback_group)
+        self.srv_query_planner_interface = self.node.create_client(QueryPlannerInterfaces, '/query_planner_interface', callback_group=self.callback_group)
 
         self.pose_iter_publisher = self.node.create_publisher(
-            PoseIteration, "pose_iter", qos_profile_system_default
+            PoseIteration, "pose_iter", qos_profile_system_default, callback_group=self.callback_group
         )
         self.traj_point_publisher = self.node.create_publisher(
-            TrajectoryPoint, "traj_point", qos_profile_system_default
+            TrajectoryPoint, "traj_point", qos_profile_system_default, callback_group=self.callback_group
         )
-        self.srv_req_plan = self.node.create_client(RequestPlan, "req_plan")
+        self.srv_req_plan = self.node.create_client(RequestPlan, "req_plan", callback_group=self.callback_group)
 
-        res = self.srv_query_planner_interface.call(request=QueryPlannerInterfaces.Request())
+        query = QueryPlannerInterfaces.Request()
+        res = self.srv_query_planner_interface.call(query, 1)
+        while res is None:
+            res = self.srv_query_planner_interface.call(query, 1)
         self.planner_interface = res.planner_interfaces
         self.planner_interface.reverse()
         pipeline_ids = [i.pipeline_id for i in self.planner_interface]
@@ -75,9 +81,6 @@ class UIMoveGroup(QDialog, Ui_Dialog):
         self.planningPipelineCombo.addItems(pipeline_ids)
         self.cb_planning_pipeline_combo_changed(0)
         self.planningPipelineCombo.currentIndexChanged.connect(self.cb_planning_pipeline_combo_changed)
-
-        self.robot_state = RobotState()
-        self.trajectory = RobotTrajectory()
 
         ### for debug
         debug = False
@@ -159,10 +162,15 @@ class UIMoveGroup(QDialog, Ui_Dialog):
         self.update_table(self.pose_df)
 
     def save(self):
-        QFileDialog.saveFileContent(self.pose_df, '', self)
+        pass
 
     def plan(self):
-        result: RequestPlan.Response= self.srv_req_plan.call(RequestPlan.Request())
+        self.node.get_logger().info("STARTING PLANNING")
+        pipeline_id, planner_id = self.get_planning_request_params()
+        query = RequestPlan.Request()
+        query.pipeline_id = pipeline_id
+        query.planner_id = planner_id
+        result = self.srv_req_plan.call(query)
         result = result.response
 
         if result.error_code.val == 1:
@@ -231,33 +239,4 @@ class UIMoveGroup(QDialog, Ui_Dialog):
         message.enabled = self.ik_enabled
         message.poses = point_next
         self.pose_iter_publisher.publish(message)
-
-    def build_motion_plan(self, pipeline_id, planner_id, robot_state, goal_constraint, **kwargs):
-        self.robot_state.joint_state.velocity = np.zeros_like(self.robot_state.joint_state.velocity, dtype=float)
-        if planner_id == 'LIN':
-            motion_plan_req = MotionPlanRequest(
-                start_state=self.robot_state,
-                goal_constraints=[goal_constraint],
-                pipeline_id=pipeline_id,
-                planner_id=planner_id,
-                group_name='right_arm',
-                num_planning_attempts=10,
-                allowed_planning_time=3.,
-                max_velocity_scaling_factor=0.1,
-                max_acceleration_scaling_factor=0.1,
-                )
-        else:
-            motion_plan_req = MotionPlanRequest(
-                start_state=self.robot_state,
-                goal_constraints=[goal_constraint],
-                pipeline_id=pipeline_id,
-                planner_id=planner_id,
-                group_name='right_arm',
-                num_planning_attempts=10,
-                allowed_planning_time=3.,
-                max_velocity_scaling_factor=1.0,
-                max_acceleration_scaling_factor=0.75,
-            )
-        return motion_plan_req
-
 
