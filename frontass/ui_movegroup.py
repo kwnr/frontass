@@ -1,17 +1,18 @@
-from PySide6.QtWidgets import QDialog, QTableWidget, QTableWidgetItem, QFileDialog
+from PySide6.QtWidgets import QDialog, QTableWidgetItem
 from PySide6.QtCore import QTimer, Signal
-from PySide6.QtGui import QColor
 from ui_assets.movegroup_ui import Ui_Dialog
 
 import numpy as np
-import rclpy
-from rclpy.node import Node
-from rclpy.qos import qos_profile_system_default, qos_profile_sensor_data
+import pandas as pd
+from scipy.spatial.transform import Rotation
 
-from std_msgs.msg import Header
+from rclpy.node import Node
+from rclpy.qos import qos_profile_system_default
+
 from ass_msgs.msg import TrajectoryExecution
 from sensor_msgs.msg import JointState
 from trajectory_msgs.msg import JointTrajectoryPoint
+from geometry_msgs.msg import Pose
 from moveit_msgs.msg import (DisplayTrajectory,
                              RobotTrajectory,
                              MotionPlanRequest,
@@ -20,25 +21,30 @@ from moveit_msgs.msg import (DisplayTrajectory,
                              Constraints,
                              PositionConstraint,
                              OrientationConstraint)
-from moveit_msgs.srv import GetMotionPlan, GetPlanningScene, QueryPlannerInterfaces
+from moveit_msgs.srv import (GetMotionPlan,
+                             GetPlanningScene,
+                             QueryPlannerInterfaces,
+                             GetPositionFK)
 
 from ass_msgs.msg import PoseIteration, TrajectoryPoint
+from visualization_msgs.srv import GetInteractiveMarkers
 
 from typing import List
 
-from visualization_msgs.srv import GetInteractiveMarkers
 import time
 
-import pandas as pd
 
 
 class UIMoveGroup(QDialog, Ui_Dialog):
     ik_traj_pos_changed = Signal(list)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args)
         self.setupUi(self)
 
         self.robot_position = np.zeros(16, dtype=float)
+        self.robot_state = RobotState()
+        self.trajectory: List[JointTrajectoryPoint] = []
 
         self.ik_enabled = False
         self.ikEnableBtn.toggled.connect(self.set_ik_enabled)
@@ -59,28 +65,75 @@ class UIMoveGroup(QDialog, Ui_Dialog):
 
         self.node: Node = kwargs["node"]
         self.callback_group = kwargs["callback_group"]
-        self.sub_traj = self.node.create_subscription(DisplayTrajectory, '/display_planned_path', self.cb_sub_traj, 10, callback_group=self.callback_group)
-        self.pub_traj = self.node.create_publisher(DisplayTrajectory, '/display_planned_path', 10, callback_group=self.callback_group)
+        self.sub_traj = self.node.create_subscription(
+            DisplayTrajectory,
+            '/display_planned_path',
+            self.cb_sub_traj,
+            10,
+            callback_group=self.callback_group
+            )
+        self.pub_traj = self.node.create_publisher(
+            DisplayTrajectory,
+            '/display_planned_path',
+            10,
+            callback_group=self.callback_group
+            )
+        self.srv_get_interactive_marker = self.node.create_client(
+            GetInteractiveMarkers,
+            ('/rviz_moveit_motion_planning_display/'
+             + 'robot_interaction_interactive_marker_topic/get_interactive_markers'),
+            callback_group=self.callback_group)
+        self.srv_get_motion_plan = self.node.create_client(
+            GetMotionPlan,
+            '/plan_kinematic_path',
+            callback_group=self.callback_group
+            )
 
-        self.srv_get_interactive_marker = self.node.create_client(GetInteractiveMarkers,
-                                '/rviz_moveit_motion_planning_display/robot_interaction_interactive_marker_topic/get_interactive_markers', callback_group=self.callback_group)
-        self.srv_get_motion_plan = self.node.create_client(GetMotionPlan, '/plan_kinematic_path', callback_group=self.callback_group)
-
-        self.srv_get_planning_scene = self.node.create_client(GetPlanningScene, '/get_planning_scene', callback_group=self.callback_group)
-        self.sub_joint_state = self.node.create_subscription(JointState, '/joint_states', self.cb_sub_joint_state, 10, callback_group=self.callback_group)
-        self.srv_query_planner_interface = self.node.create_client(QueryPlannerInterfaces, '/query_planner_interface', callback_group=self.callback_group)
+        self.srv_get_planning_scene = self.node.create_client(
+            GetPlanningScene,
+            '/get_planning_scene',
+            callback_group=self.callback_group
+            )
+        self.sub_joint_state = self.node.create_subscription(
+            JointState,
+            '/joint_states',
+            self.cb_sub_joint_state,
+            10,
+            callback_group=self.callback_group
+            )
+        self.srv_query_planner_interface = self.node.create_client(
+            QueryPlannerInterfaces,
+            '/query_planner_interface',
+            callback_group=self.callback_group
+            )
+        self.srv_compute_fk = self.node.create_client(
+            GetPositionFK,
+            '/compute_fk',
+            callback_group=self.callback_group
+        )
 
         self.pose_iter_publisher = self.node.create_publisher(
-            PoseIteration, "pose_iter", qos_profile_system_default, callback_group=self.callback_group
+            PoseIteration,
+            "pose_iter",
+            qos_profile_system_default,
+            callback_group=self.callback_group
         )
         self.traj_point_publisher = self.node.create_publisher(
-            TrajectoryPoint, "traj_point", qos_profile_system_default, callback_group=self.callback_group
+            TrajectoryPoint,
+            "traj_point",
+            qos_profile_system_default,
+            callback_group=self.callback_group
         )
         self.planned_trajectory_publisher = self.node.create_publisher(
-            MotionPlanResponse, "planned_trajectory", qos_profile_system_default, callback_group=self.callback_group
+            MotionPlanResponse,
+            "planned_trajectory",
+            qos_profile_system_default,
+            callback_group=self.callback_group
         )
         self.traj_exec_publisher = self.node.create_publisher(
-            TrajectoryExecution, "traj_exec", qos_profile_system_default
+            TrajectoryExecution,
+            "traj_exec",
+            qos_profile_system_default
         )
 
         res = self.srv_query_planner_interface.call(QueryPlannerInterfaces.Request())
@@ -90,12 +143,14 @@ class UIMoveGroup(QDialog, Ui_Dialog):
 
         self.planningPipelineCombo.addItems(pipeline_ids)
         self.cb_planning_pipeline_combo_changed(0)
-        self.planningPipelineCombo.currentIndexChanged.connect(self.cb_planning_pipeline_combo_changed)
+        self.planningPipelineCombo.currentIndexChanged.connect(
+            self.cb_planning_pipeline_combo_changed
+            )
+        self.getCurrentPoseBtn.clicked.connect(
+            self.cb_get_current_pose
+        )
 
-        self.robot_state = RobotState()
-        self.trajectory: List[JointTrajectoryPoint] = []
-
-        ### for debug
+        # for debug
         debug = False
         if debug:
             self.ik_traj_pos_changed.connect(print)
@@ -109,7 +164,6 @@ class UIMoveGroup(QDialog, Ui_Dialog):
 
     def cb_sub_traj(self, data: DisplayTrajectory):
         traj: RobotTrajectory = data.trajectory[0]
-        traj_start = data.trajectory_start
 
         pos = [point.positions for point in traj.joint_trajectory.points]
 
@@ -129,6 +183,43 @@ class UIMoveGroup(QDialog, Ui_Dialog):
         self.plannerIDCombo.clear()
         self.plannerIDCombo.addItems(planner_ids)
 
+    def cb_get_current_pose(self):
+        fk_req = GetPositionFK.Request()
+        fk_req.fk_link_names = ['base_link_right',
+                                'link1_right',
+                                'link2_right',
+                                'link3_right',
+                                'link4_right',
+                                'link5_right',
+                                'link6_right']
+        fk_req.robot_state = self.robot_state
+        fk_response: GetPositionFK.Response = self.srv_compute_fk.call(fk_req)
+        if fk_response.error_code.val == 1:
+            pose = fk_response.pose_stamped[6].pose
+            r, p, y = Rotation.from_quat([pose.orientation.x,
+                                          pose.orientation.y,
+                                          pose.orientation.z,
+                                          pose.orientation.w]).as_euler('xyz', True)
+            self.xDoubleSpinBox.setValue(pose.position.x * 1000)
+            self.yDoubleSpinBox.setValue(pose.position.y * 1000)
+            self.zDoubleSpinBox.setValue(pose.position.z * 1000)
+            self.rollDoubleSpinBox.setValue(r)
+            self.pitchDoubleSpinBox.setValue(p)
+            self.yawDoubleSpinBox.setValue(y)
+
+        marker = self.srv_get_interactive_marker.call(
+            GetInteractiveMarkers.Request()).markers[0]
+        r, p, y = Rotation.from_quat([marker.pose.orientation.x,
+                                      marker.pose.orientation.y,
+                                      marker.pose.orientation.z,
+                                      marker.pose.orientation.w]).as_euler('xyz', True)
+        self.targetXDoubleSpinBox.setValue(marker.pose.position.x * 1000)
+        self.targetYDoubleSpinBox.setValue(marker.pose.position.y * 1000)
+        self.targetZDoubleSpinBox.setValue(marker.pose.position.z * 1000)
+        self.targetRollDoubleSpinBox.setValue(r)
+        self.targetPitchDoubleSpinBox.setValue(p)
+        self.targetYawDoubleSpinBox.setValue(y)
+
     def get_planning_request_params(self):
         pipeline_id = self.planningPipelineCombo.currentText()
         planner_id = self.plannerIDCombo.currentText()
@@ -137,7 +228,9 @@ class UIMoveGroup(QDialog, Ui_Dialog):
     def build_table(self, positions, nanosecs):
         point = np.rad2deg(positions)
         self.pose_df = pd.DataFrame(
-            index=[f'L{i}' for i in range(1,9)]+[f'R{i}' for i in range(1,9)]+["time"],
+            index=[
+                f'L{i}' for i in range(1, 9)]+[
+                    f'R{i}' for i in range(1, 9)]+["time"],
             columns=[str(i) for i, p in enumerate(point)])
         self.pose_df.iloc[8:14] = np.rad2deg(positions).T
         self.pose_df.iloc[16] = nanosecs
@@ -180,12 +273,26 @@ class UIMoveGroup(QDialog, Ui_Dialog):
             self.pose_df.to_csv(filename)
             self.node.get_logger().info(f"Trajectory saved to {filename}")
 
+    def get_target_pose(self):
+        x = self.targetXDoubleSpinBox.value() / 1000
+        y = self.targetYDoubleSpinBox.value() / 1000
+        z = self.targetZDoubleSpinBox.value() / 1000
+        position = [x, y, z]
+
+        roll = self.targetRollDoubleSpinBox.value()
+        pitch = self.targetPitchDoubleSpinBox.value()
+        yaw = self.targetYawDoubleSpinBox.value()
+        orientation = Rotation.from_euler(
+            'xyz', [roll, pitch, yaw], degrees=True).as_quat().tolist()
+
+        return position, orientation
 
     def plan(self):
-        marker = self.srv_get_interactive_marker.call(GetInteractiveMarkers.Request()).markers[0]
         pipeline_id, planner_id = self.get_planning_request_params()
+        target_position, target_orientation = self.get_target_pose()
 
-        goal_constraint = self.construct_link_constraints('link6_right', marker, 0.01, 0.01)
+        goal_constraint = self.construct_link_constraints(
+            'link6_right', target_position, target_orientation, 0.01, 0.01)
 
         motion_plan_request = self.build_motion_plan(pipeline_id,
                                                      planner_id,
@@ -227,8 +334,10 @@ class UIMoveGroup(QDialog, Ui_Dialog):
         point_next = self.trajectory[idx+1]
         pos = np.array(point.positions)
         pos_next = np.array(point_next.positions)
-        time_from_start = point.time_from_start.sec * 1e9 + point.time_from_start.nanosec
-        time_from_start_next = point_next.time_from_start.sec * 1e9 + point_next.time_from_start.nanosec
+        time_from_start = (point.time_from_start.sec * 1e9
+                           + point.time_from_start.nanosec)
+        time_from_start_next = (point_next.time_from_start.sec * 1e9
+                                + point_next.time_from_start.nanosec)
 
         interpolated = (pos +
                         (pos_next - pos)
@@ -243,13 +352,27 @@ class UIMoveGroup(QDialog, Ui_Dialog):
         message.point.time_from_start.nanosec = int(time_passed % 1e9)
         self.traj_point_publisher.publish(message)
 
-    def construct_link_constraints(self, link_name: str, marker , position_tol: float, orientation_tol: float):
+    def construct_link_constraints(self,
+                                   link_name: str,
+                                   target_position: List[float],
+                                   target_oritentaion: List[float],
+                                   position_tol: float,
+                                   orientation_tol: float):
+        pose = Pose()
+        pose.position.x = target_position[0]
+        pose.position.y = target_position[1]
+        pose.position.z = target_position[2]
+        pose.orientation.x = target_oritentaion[0]
+        pose.orientation.y = target_oritentaion[1]
+        pose.orientation.z = target_oritentaion[2]
+        pose.orientation.w = target_oritentaion[3]
+
         position_constraint = PositionConstraint()
         position_constraint.link_name = link_name
         position_constraint.target_point_offset.x = position_tol
         position_constraint.target_point_offset.y = position_tol
         position_constraint.target_point_offset.z = position_tol
-        position_constraint.constraint_region.primitive_poses = [marker.pose]
+        position_constraint.constraint_region.primitive_poses = [pose]
         position_constraint.weight = 1.0
 
         orientation_constraint = OrientationConstraint()
@@ -257,7 +380,7 @@ class UIMoveGroup(QDialog, Ui_Dialog):
         orientation_constraint.absolute_x_axis_tolerance = orientation_tol
         orientation_constraint.absolute_y_axis_tolerance = orientation_tol
         orientation_constraint.absolute_z_axis_tolerance = orientation_tol
-        orientation_constraint.orientation = marker.pose.orientation
+        orientation_constraint.orientation = pose.orientation
         orientation_constraint.weight = 1.0
 
         goal_constraint = Constraints()
@@ -266,8 +389,9 @@ class UIMoveGroup(QDialog, Ui_Dialog):
 
         return goal_constraint
 
-    def build_motion_plan(self, pipeline_id, planner_id, robot_state, goal_constraint, **kwargs):
-        self.robot_state.joint_state.velocity = np.zeros_like(self.robot_state.joint_state.velocity, dtype=float).tolist()
+    def build_motion_plan(self, pipeline_id, planner_id, robot_state, goal_constraint):
+        self.robot_state.joint_state.velocity = np.zeros_like(
+            self.robot_state.joint_state.velocity, dtype=float).tolist()
         if planner_id == 'LIN':
             motion_plan_req = MotionPlanRequest(
                 start_state=self.robot_state,

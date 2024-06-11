@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>754</width>
-    <height>599</height>
+    <height>897</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,8 +19,8 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>680</x>
-     <y>30</y>
+     <x>150</x>
+     <y>20</y>
      <width>41</width>
      <height>41</height>
     </rect>
@@ -82,15 +82,14 @@
   <widget class="QLabel" name="ikLabel">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>30</y>
-     <width>91</width>
+     <x>20</x>
+     <y>20</y>
+     <width>131</width>
      <height>41</height>
     </rect>
    </property>
    <property name="text">
-    <string>IK mode
-Enabled</string>
+    <string>IK mode Enabled</string>
    </property>
   </widget>
   <widget class="QPushButton" name="execBtn">
@@ -100,9 +99,9 @@ Enabled</string>
    <property name="geometry">
     <rect>
      <x>570</x>
-     <y>140</y>
+     <y>170</y>
      <width>161</width>
-     <height>50</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="text">
@@ -113,8 +112,8 @@ Enabled</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>30</y>
-     <width>531</width>
+     <y>330</y>
+     <width>711</width>
      <height>541</height>
     </rect>
    </property>
@@ -222,29 +221,13 @@ Enabled</string>
    <property name="geometry">
     <rect>
      <x>570</x>
-     <y>200</y>
+     <y>230</y>
      <width>171</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
     <string>status: NOT PLANNED</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="loopCheckBox">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>570</x>
-     <y>240</y>
-     <width>151</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Loop Trajectory</string>
    </property>
   </widget>
   <widget class="QPushButton" name="saveTrajBtn">
@@ -254,7 +237,7 @@ Enabled</string>
    <property name="geometry">
     <rect>
      <x>570</x>
-     <y>520</y>
+     <y>260</y>
      <width>161</width>
      <height>50</height>
     </rect>
@@ -266,8 +249,8 @@ Enabled</string>
   <widget class="QComboBox" name="planningPipelineCombo">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>290</y>
+     <x>380</x>
+     <y>230</y>
      <width>161</width>
      <height>25</height>
     </rect>
@@ -276,8 +259,8 @@ Enabled</string>
   <widget class="QComboBox" name="plannerIDCombo">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>350</y>
+     <x>380</x>
+     <y>290</y>
      <width>161</width>
      <height>25</height>
     </rect>
@@ -286,8 +269,8 @@ Enabled</string>
   <widget class="QLabel" name="planStatusLabel_2">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>270</y>
+     <x>380</x>
+     <y>210</y>
      <width>171</width>
      <height>17</height>
     </rect>
@@ -299,8 +282,8 @@ Enabled</string>
   <widget class="QLabel" name="planStatusLabel_3">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>330</y>
+     <x>380</x>
+     <y>270</y>
      <width>171</width>
      <height>17</height>
     </rect>
@@ -316,13 +299,304 @@ Enabled</string>
    <property name="geometry">
     <rect>
      <x>570</x>
-     <y>80</y>
+     <y>100</y>
      <width>161</width>
-     <height>50</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="text">
     <string>PLAN</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="formLayoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>100</y>
+     <width>160</width>
+     <height>231</height>
+    </rect>
+   </property>
+   <layout class="QFormLayout" name="targetFormLayout">
+    <property name="verticalSpacing">
+     <number>12</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="QLabel" name="targetXLabel">
+      <property name="text">
+       <string>X</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QDoubleSpinBox" name="targetXDoubleSpinBox">
+      <property name="minimum">
+       <double>-999.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>999.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="targetYLabel">
+      <property name="text">
+       <string>Y</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QDoubleSpinBox" name="targetYDoubleSpinBox">
+      <property name="minimum">
+       <double>-999.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>999.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="targetZLabel">
+      <property name="text">
+       <string>Z</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QDoubleSpinBox" name="targetZDoubleSpinBox">
+      <property name="minimum">
+       <double>-999.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>999.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="targetRollLabel">
+      <property name="text">
+       <string>Roll</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QDoubleSpinBox" name="targetRollDoubleSpinBox">
+      <property name="minimum">
+       <double>-999.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>999.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="targetPitchLabel">
+      <property name="text">
+       <string>Pitch</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QDoubleSpinBox" name="targetPitchDoubleSpinBox">
+      <property name="minimum">
+       <double>-999.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>999.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0">
+     <widget class="QLabel" name="targetYawLabel">
+      <property name="text">
+       <string>Yaw</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="1">
+     <widget class="QDoubleSpinBox" name="targetYawDoubleSpinBox">
+      <property name="minimum">
+       <double>-999.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>999.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>70</y>
+     <width>161</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Target Pose</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="formLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>100</y>
+     <width>160</width>
+     <height>231</height>
+    </rect>
+   </property>
+   <layout class="QFormLayout" name="formLayout">
+    <property name="verticalSpacing">
+     <number>12</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="QLabel" name="xLabel">
+      <property name="text">
+       <string>X</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QDoubleSpinBox" name="xDoubleSpinBox">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="minimum">
+       <double>-999.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>999.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="yLabel">
+      <property name="text">
+       <string>Y</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QDoubleSpinBox" name="yDoubleSpinBox">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="minimum">
+       <double>-999.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>999.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="zLabel">
+      <property name="text">
+       <string>Z</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QDoubleSpinBox" name="zDoubleSpinBox">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="minimum">
+       <double>-999.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>999.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="rollLabel">
+      <property name="text">
+       <string>Roll</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QDoubleSpinBox" name="rollDoubleSpinBox">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="minimum">
+       <double>-999.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>999.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="pitchLabel">
+      <property name="text">
+       <string>Pitch</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QDoubleSpinBox" name="pitchDoubleSpinBox">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="minimum">
+       <double>-999.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>999.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0">
+     <widget class="QLabel" name="yawLabel">
+      <property name="text">
+       <string>Yaw</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="1">
+     <widget class="QDoubleSpinBox" name="yawDoubleSpinBox">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="minimum">
+       <double>-999.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>999.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>70</y>
+     <width>161</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Current Pose</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="getCurrentPoseBtn">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>100</y>
+     <width>161</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Get Current Pose</string>
    </property>
   </widget>
  </widget>

@@ -1,6 +1,5 @@
 from setuptools import find_packages, setup
 import os
-import glob
 
 package_name = 'frontass'
 
@@ -14,6 +13,11 @@ setup(
         (os.path.join('share', package_name, 'launch'), ['launch/ui.launch.py']),
         (os.path.join('share', package_name, 'launch'), ['launch/ui_movegroup.launch.py'])
     ],
+    py_modules=[
+        'frontass.ui_movegroup', 'frontass.ui_fig_select_diag',
+        'frontass.ui_pose_iterator', 'frontass.ui_preset_diag',
+        'frontass.ui_pump_config_diag', 'frontass.ui_state_diag',
+        'frontass.utils'],
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='kwnr',
