@@ -16,9 +16,11 @@ from moveit_msgs.msg import (DisplayTrajectory,
                              RobotTrajectory,
                              MotionPlanRequest,
                              MotionPlanResponse,
-                             RobotState)
+                             RobotState,
+                             Constraints,
+                             PositionConstraint,
+                             OrientationConstraint)
 from moveit_msgs.srv import GetMotionPlan, GetPlanningScene, QueryPlannerInterfaces
-from moveit.core.kinematic_constraints import construct_link_constraint
 
 from ass_msgs.msg import PoseIteration, TrajectoryPoint
 
@@ -180,39 +182,18 @@ class UIMoveGroup(QDialog, Ui_Dialog):
 
 
     def plan(self):
-        result = self.srv_get_interactive_marker.call(GetInteractiveMarkers.Request())
-        marker = result.markers[0]
-
-        result = self.srv_get_planning_scene.call(GetPlanningScene.Request(compunents=2))
-
-        marker_position = [marker.pose.position.x,
-                           marker.pose.position.y,
-                           marker.pose.position.z]
-        marker_orientation = [
-            marker.pose.orientation.x,
-            marker.pose.orientation.y,
-            marker.pose.orientation.z,
-            marker.pose.orientation.w,
-        ]
+        marker = self.srv_get_interactive_marker.call(GetInteractiveMarkers.Request()).markers[0]
         pipeline_id, planner_id = self.get_planning_request_params()
 
-        goal_constraint = construct_link_constraint('link6_right',
-                                                    source_frame='base_link_right',
-                                                    cartesian_position=marker_position,
-                                                    cartesian_position_tolerance=0.01,
-                                                    orientation=marker_orientation,
-                                                    orientation_tolerance=0.01)
+        goal_constraint = self.construct_link_constraints('link6_right', marker, 0.01, 0.01)
 
         motion_plan_request = self.build_motion_plan(pipeline_id,
                                                      planner_id,
                                                      self.robot_state,
                                                      goal_constraint)
-
         result = self.srv_get_motion_plan.call(
             GetMotionPlan.Request(motion_plan_request=motion_plan_request)
-            )
-        result: MotionPlanResponse = result.motion_plan_response
-        print(result)
+            ).motion_plan_response
         if result.error_code.val == 1:
             self.planned_trajectory_publisher.publish(result)
             self.trajectory = result.trajectory.joint_trajectory.points
@@ -262,8 +243,31 @@ class UIMoveGroup(QDialog, Ui_Dialog):
         message.point.time_from_start.nanosec = int(time_passed % 1e9)
         self.traj_point_publisher.publish(message)
 
+    def construct_link_constraints(self, link_name: str, marker , position_tol: float, orientation_tol: float):
+        position_constraint = PositionConstraint()
+        position_constraint.link_name = link_name
+        position_constraint.target_point_offset.x = position_tol
+        position_constraint.target_point_offset.y = position_tol
+        position_constraint.target_point_offset.z = position_tol
+        position_constraint.constraint_region.primitive_poses = [marker.pose]
+        position_constraint.weight = 1.0
+
+        orientation_constraint = OrientationConstraint()
+        orientation_constraint.link_name = link_name
+        orientation_constraint.absolute_x_axis_tolerance = orientation_tol
+        orientation_constraint.absolute_y_axis_tolerance = orientation_tol
+        orientation_constraint.absolute_z_axis_tolerance = orientation_tol
+        orientation_constraint.orientation = marker.pose.orientation
+        orientation_constraint.weight = 1.0
+
+        goal_constraint = Constraints()
+        goal_constraint.position_constraints = [position_constraint]
+        goal_constraint.orientation_constraints = [orientation_constraint]
+
+        return goal_constraint
+
     def build_motion_plan(self, pipeline_id, planner_id, robot_state, goal_constraint, **kwargs):
-        self.robot_state.joint_state.velocity = np.zeros_like(self.robot_state.joint_state.velocity, dtype=float)
+        self.robot_state.joint_state.velocity = np.zeros_like(self.robot_state.joint_state.velocity, dtype=float).tolist()
         if planner_id == 'LIN':
             motion_plan_req = MotionPlanRequest(
                 start_state=self.robot_state,
@@ -273,8 +277,8 @@ class UIMoveGroup(QDialog, Ui_Dialog):
                 group_name='right_arm',
                 num_planning_attempts=10,
                 allowed_planning_time=3.,
-                max_velocity_scaling_factor=0.03,
-                max_acceleration_scaling_factor=0.03,
+                max_velocity_scaling_factor=0.1,
+                max_acceleration_scaling_factor=0.1,
                 )
         else:
             motion_plan_req = MotionPlanRequest(
