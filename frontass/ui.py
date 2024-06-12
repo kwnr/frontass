@@ -48,7 +48,7 @@ from matplotlib import color_sequences
 class UI(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        self.node = Node("assui_kwnr")
+        self.node = Node("assui_kwnr", namespace="mark4")
 
         self.setupUi(self)
 
@@ -62,16 +62,16 @@ class UI(QMainWindow, Ui_MainWindow):
 
         self.node.create_subscription(
             Robot2UI,
-            "robot_to_ui",
+            "/mark4/robot_to_ui",
             self.cb_subscribe_robot_state,
             qos_profile_system_default,
             callback_group=self.mutex_callback_group
         )
         self.hold_pub = self.node.create_publisher(
-            Hold, "hold", qos_profile_system_default, callback_group=self.callback_group
+            Hold, "/mark4/hold", qos_profile_system_default, callback_group=self.callback_group
         )
         self.ui_action_pub = self.node.create_publisher(
-            UIAction, "ui_action", qos_profile_system_default, callback_group=self.callback_group
+            UIAction, "/mark4/ui_action", qos_profile_system_default, callback_group=self.callback_group
         )
 
         # ui properties

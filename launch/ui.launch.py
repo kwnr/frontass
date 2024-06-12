@@ -28,6 +28,7 @@ def generate_launch_description():
         )
     movegroup_node = Node(package='moveit_ros_move_group',
                           executable='move_group',
+                          namespace='mark4',
                           output='screen',
                           parameters=[moveit_config.to_dict()]
                           )
@@ -40,6 +41,7 @@ def generate_launch_description():
         package="rviz2",
         executable="rviz2",
         name="rviz2",
+        namespace='mark4',
         output="log",
         arguments=["-d", rviz_config],
         parameters=[
@@ -53,8 +55,9 @@ def generate_launch_description():
         package="tf2_ros",
         executable="static_transform_publisher",
         name="static_transform_publisher",
+        namespace="mark4",
         output="log",
-        arguments=["--frame-id", "world","--child-frame-id", "base_link_right"],
+        arguments=["--frame-id", "world", "--child-frame-id", "base_link_right"],
     )
     """robot_state_publisher = Node(
         package="robot_state_publisher",
@@ -77,7 +80,7 @@ def generate_launch_description():
         robot_state_publisher,
         Node(
             package="frontass",
-            namespace="/",
+            namespace="/mark4",
             executable="ui",
             name="ui"
         )
