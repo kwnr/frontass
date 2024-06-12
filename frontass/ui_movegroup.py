@@ -26,13 +26,12 @@ from moveit_msgs.srv import (GetMotionPlan,
                              QueryPlannerInterfaces,
                              GetPositionFK)
 
-from ass_msgs.msg import PoseIteration, TrajectoryPoint
+from ass_msgs.msg import PoseIteration, TrajectoryPoint, TrajectoryEnabled
 from visualization_msgs.srv import GetInteractiveMarkers
 
 from typing import List
 
 import time
-
 
 
 class UIMoveGroup(QDialog, Ui_Dialog):
@@ -60,7 +59,8 @@ class UIMoveGroup(QDialog, Ui_Dialog):
         # self.execBtn.clicked.connect(self.timer_execution.start)
         self.execBtn.clicked.connect(self.cb_execution_with_traj)
 
-        # set when execution started. if execution finished or not started, then set to None
+        # set when execution started.
+        # if execution finished or not started, then set to None
         self.time_exec_started = None
 
         self.node: Node = kwargs["node"]
@@ -135,6 +135,11 @@ class UIMoveGroup(QDialog, Ui_Dialog):
             "traj_exec",
             qos_profile_system_default
         )
+        self.traj_enabled_publisher = self.node.create_publisher(
+            TrajectoryEnabled,
+            "traj_enabled",
+            qos_profile_system_default
+        )
 
         res = self.srv_query_planner_interface.call(QueryPlannerInterfaces.Request())
         self.planner_interface = res.planner_interfaces
@@ -157,13 +162,10 @@ class UIMoveGroup(QDialog, Ui_Dialog):
 
     def set_ik_enabled(self, val):
         self.ik_enabled = val
-        if val:
-            self.ik_traj_pos_changed.emit([True, [np.nan]*16])
-        else:
-            self.ik_traj_pos_changed.emit([False, [np.nan]*16])
+        self.traj_enabled_publisher.publish(TrajectoryEnabled(enabled=self.ik_enabled))
 
     def cb_sub_traj(self, data: DisplayTrajectory):
-        traj: RobotTrajectory = data.trajectory[0]
+        traj: RobotTrajectory = data.trajectory[0]  # type: ignore
 
         pos = [point.positions for point in traj.joint_trajectory.points]
 
@@ -417,5 +419,3 @@ class UIMoveGroup(QDialog, Ui_Dialog):
                 max_acceleration_scaling_factor=0.75,
             )
         return motion_plan_req
-
-

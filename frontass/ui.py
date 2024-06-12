@@ -530,22 +530,41 @@ class UI(QMainWindow, Ui_MainWindow):
         self.arm_graph_tool_btn.clicked.connect(self.fig_sel_diag.show)
         self.fig_sel_diag.checkbox_state = np.zeros((6, 16)).astype(bool)
 
-        self.ik_diag = UIMoveGroup(self, node=self.node, callback_group=self.callback_group)
+        self.ik_diag = UIMoveGroup(
+            self,
+            node=self.node,
+            callback_group=self.callback_group)
         self.ik_mode_btn.clicked.connect(self.ik_diag.show)
         self.joint_state_publisher = self.node.create_publisher(
-            JointState, "joint_states", qos_profile_system_default, callback_group=self.mutex_callback_group
+            JointState,
+            "joint_states",
+            qos_profile_system_default,
+            callback_group=self.mutex_callback_group
         )
-        self.ik_diag.timer_robot_position.timeout.connect(lambda: self.ik_diag.cb_movegroup(self.joint_pos))
+        self.ik_diag.timer_robot_position.timeout.connect(
+            lambda: self.ik_diag.cb_movegroup(self.joint_pos))
         self.ik_mode_btn.clicked.connect(self.ik_diag.timer_robot_position.start)
         self.ik_diag.finished.connect(self.ik_diag.timer_robot_position.stop)
         self.ik_diag.ik_traj_pos_changed.connect(self.publish_pose_override)
 
-        self.preset_diag.enable_preset_mode_btn.clicked.connect(lambda: self.ik_diag.ikEnableBtn.setChecked(False))
-        self.preset_diag.enable_preset_mode_btn.clicked.connect(lambda: self.pose_iteration_diag.enabled_btn.setChecked(False))
-        self.pose_iteration_diag.enabled_btn.clicked.connect(lambda: self.preset_diag.enable_preset_mode_btn.setChecked(False))
-        self.pose_iteration_diag.enabled_btn.clicked.connect(lambda: self.ik_diag.ikEnableBtn.setChecked(False))
-        self.ik_diag.ikEnableBtn.clicked.connect(lambda: self.preset_diag.enable_preset_mode_btn.setChecked(False))
-        self.ik_diag.ikEnableBtn.clicked.connect(lambda: self.pose_iteration_diag.enabled_btn.setChecked(False))
+        self.preset_diag.enable_preset_mode_btn.clicked.connect(
+            lambda: self.ik_diag.ikEnableBtn.setChecked(False)
+            )
+        self.preset_diag.enable_preset_mode_btn.clicked.connect(
+            lambda: self.pose_iteration_diag.enabled_btn.setChecked(False)
+            )
+        self.pose_iteration_diag.enabled_btn.clicked.connect(
+            lambda: self.preset_diag.enable_preset_mode_btn.setChecked(False)
+            )
+        self.pose_iteration_diag.enabled_btn.clicked.connect(
+            lambda: self.ik_diag.ikEnableBtn.setChecked(False)
+            )
+        self.ik_diag.ikEnableBtn.clicked.connect(
+            lambda: self.preset_diag.enable_preset_mode_btn.setChecked(False)
+            )
+        self.ik_diag.ikEnableBtn.clicked.connect(
+            lambda: self.pose_iteration_diag.enabled_btn.setChecked(False)
+            )
 
     def publish_pose_override(self, value):
         message = PoseIteration()
@@ -556,7 +575,6 @@ class UI(QMainWindow, Ui_MainWindow):
         else:
             pass
         self.pose_iter_publisher.publish(message)
-
 
     def cb_pump_config_accepted(self):
         self.pump_tgt_speed = int(self.pump_config_diag.manualTargetRPMLineEdit.text())
