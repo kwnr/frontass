@@ -18,7 +18,7 @@
     <rect>
      <x>20</x>
      <y>20</y>
-     <width>101</width>
+     <width>103</width>
      <height>261</height>
     </rect>
    </property>
@@ -33,10 +33,13 @@
     <item row="0" column="1">
      <widget class="QDoubleSpinBox" name="l1DoubleSpinBox">
       <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
       </property>
       <property name="minimum">
-       <double>-99.989999999999995</double>
+       <double>-999.990000000000009</double>
+      </property>
+      <property name="maximum">
+       <double>999.990000000000009</double>
       </property>
      </widget>
     </item>
@@ -50,10 +53,13 @@
     <item row="1" column="1">
      <widget class="QDoubleSpinBox" name="l2DoubleSpinBox">
       <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
       </property>
       <property name="minimum">
-       <double>-99.989999999999995</double>
+       <double>-999.990000000000009</double>
+      </property>
+      <property name="maximum">
+       <double>999.990000000000009</double>
       </property>
      </widget>
     </item>
@@ -67,10 +73,13 @@
     <item row="2" column="1">
      <widget class="QDoubleSpinBox" name="l3DoubleSpinBox">
       <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
       </property>
       <property name="minimum">
-       <double>-99.989999999999995</double>
+       <double>-999.990000000000009</double>
+      </property>
+      <property name="maximum">
+       <double>999.990000000000009</double>
       </property>
       <property name="value">
        <double>20.000000000000000</double>
@@ -87,10 +96,13 @@
     <item row="3" column="1">
      <widget class="QDoubleSpinBox" name="l4DoubleSpinBox">
       <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
       </property>
       <property name="minimum">
-       <double>-99.989999999999995</double>
+       <double>-999.990000000000009</double>
+      </property>
+      <property name="maximum">
+       <double>999.990000000000009</double>
       </property>
      </widget>
     </item>
@@ -104,10 +116,13 @@
     <item row="4" column="1">
      <widget class="QDoubleSpinBox" name="l5DoubleSpinBox">
       <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
       </property>
       <property name="minimum">
-       <double>-99.989999999999995</double>
+       <double>-999.990000000000009</double>
+      </property>
+      <property name="maximum">
+       <double>999.990000000000009</double>
       </property>
      </widget>
     </item>
@@ -121,10 +136,13 @@
     <item row="5" column="1">
      <widget class="QDoubleSpinBox" name="l6DoubleSpinBox">
       <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
       </property>
       <property name="minimum">
-       <double>-99.989999999999995</double>
+       <double>-999.990000000000009</double>
+      </property>
+      <property name="maximum">
+       <double>999.990000000000009</double>
       </property>
      </widget>
     </item>
@@ -138,10 +156,13 @@
     <item row="6" column="1">
      <widget class="QDoubleSpinBox" name="l7DoubleSpinBox">
       <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
       </property>
       <property name="minimum">
-       <double>-99.989999999999995</double>
+       <double>-999.990000000000009</double>
+      </property>
+      <property name="maximum">
+       <double>999.990000000000009</double>
       </property>
      </widget>
     </item>
@@ -155,10 +176,13 @@
     <item row="7" column="1">
      <widget class="QDoubleSpinBox" name="l8DoubleSpinBox">
       <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
       </property>
       <property name="minimum">
-       <double>-99.989999999999995</double>
+       <double>-999.990000000000009</double>
+      </property>
+      <property name="maximum">
+       <double>999.990000000000009</double>
       </property>
      </widget>
     </item>
@@ -169,7 +193,7 @@
     <rect>
      <x>140</x>
      <y>20</y>
-     <width>101</width>
+     <width>104</width>
      <height>261</height>
     </rect>
    </property>
@@ -184,10 +208,13 @@
     <item row="0" column="1">
      <widget class="QDoubleSpinBox" name="r1DoubleSpinBox">
       <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTop|Qt::AlignmentFlag::AlignTrailing</set>
       </property>
       <property name="minimum">
-       <double>-99.989999999999995</double>
+       <double>-999.990000000000009</double>
+      </property>
+      <property name="maximum">
+       <double>999.990000000000009</double>
       </property>
      </widget>
     </item>
@@ -201,10 +228,13 @@
     <item row="1" column="1">
      <widget class="QDoubleSpinBox" name="r2DoubleSpinBox">
       <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTop|Qt::AlignmentFlag::AlignTrailing</set>
       </property>
       <property name="minimum">
-       <double>-99.989999999999995</double>
+       <double>-999.990000000000009</double>
+      </property>
+      <property name="maximum">
+       <double>999.990000000000009</double>
       </property>
      </widget>
     </item>
@@ -218,10 +248,13 @@
     <item row="2" column="1">
      <widget class="QDoubleSpinBox" name="r3DoubleSpinBox">
       <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTop|Qt::AlignmentFlag::AlignTrailing</set>
       </property>
       <property name="minimum">
-       <double>-99.989999999999995</double>
+       <double>-999.990000000000009</double>
+      </property>
+      <property name="maximum">
+       <double>999.990000000000009</double>
       </property>
       <property name="value">
        <double>20.000000000000000</double>
@@ -238,10 +271,13 @@
     <item row="3" column="1">
      <widget class="QDoubleSpinBox" name="r4DoubleSpinBox">
       <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTop|Qt::AlignmentFlag::AlignTrailing</set>
       </property>
       <property name="minimum">
-       <double>-99.989999999999995</double>
+       <double>-999.990000000000009</double>
+      </property>
+      <property name="maximum">
+       <double>999.990000000000009</double>
       </property>
      </widget>
     </item>
@@ -255,10 +291,13 @@
     <item row="4" column="1">
      <widget class="QDoubleSpinBox" name="r5DoubleSpinBox">
       <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTop|Qt::AlignmentFlag::AlignTrailing</set>
       </property>
       <property name="minimum">
-       <double>-99.989999999999995</double>
+       <double>-999.990000000000009</double>
+      </property>
+      <property name="maximum">
+       <double>999.990000000000009</double>
       </property>
      </widget>
     </item>
@@ -272,10 +311,13 @@
     <item row="5" column="1">
      <widget class="QDoubleSpinBox" name="r6DoubleSpinBox">
       <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTop|Qt::AlignmentFlag::AlignTrailing</set>
       </property>
       <property name="minimum">
-       <double>-99.989999999999995</double>
+       <double>-999.990000000000009</double>
+      </property>
+      <property name="maximum">
+       <double>999.990000000000009</double>
       </property>
      </widget>
     </item>
@@ -289,10 +331,13 @@
     <item row="6" column="1">
      <widget class="QDoubleSpinBox" name="r7DoubleSpinBox">
       <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTop|Qt::AlignmentFlag::AlignTrailing</set>
       </property>
       <property name="minimum">
-       <double>-99.989999999999995</double>
+       <double>-999.990000000000009</double>
+      </property>
+      <property name="maximum">
+       <double>999.990000000000009</double>
       </property>
      </widget>
     </item>
@@ -306,10 +351,13 @@
     <item row="7" column="1">
      <widget class="QDoubleSpinBox" name="r8DoubleSpinBox">
       <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTop|Qt::AlignmentFlag::AlignTrailing</set>
       </property>
       <property name="minimum">
-       <double>-99.989999999999995</double>
+       <double>-999.990000000000009</double>
+      </property>
+      <property name="maximum">
+       <double>999.990000000000009</double>
       </property>
      </widget>
     </item>
@@ -338,7 +386,7 @@
     </rect>
    </property>
    <property name="standardButtons">
-    <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+    <set>QDialogButtonBox::StandardButton::Apply|QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
    </property>
    <property name="centerButtons">
     <bool>false</bool>
