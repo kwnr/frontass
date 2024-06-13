@@ -19,6 +19,7 @@ from ui_pump_config_diag import UIPumpConfigDiag
 from ui_preset_diag import UIPresetDiag
 from ui_pose_iterator import UIPoseIterator
 from ui_movegroup import UIMoveGroup
+from ui_dxl_control import UIDXLControl
 from utils import BlitManager
 
 import rclpy
@@ -34,9 +35,6 @@ from typing import List
 from itertools import compress
 import numpy as np
 import nmcli
-
-from subprocess import Popen, PIPE
-import signal
 
 from matplotlib.backends.backend_qtagg import FigureCanvas
 from matplotlib.figure import Figure
@@ -546,6 +544,9 @@ class UI(QMainWindow, Ui_MainWindow):
         self.ik_mode_btn.clicked.connect(self.ik_diag.timer_robot_position.start)
         self.ik_diag.finished.connect(self.ik_diag.timer_robot_position.stop)
         self.ik_diag.ik_traj_pos_changed.connect(self.publish_pose_override)
+
+        self.dxl_control_diag = UIDXLControl(self)
+        self.dxlControlBtn.clicked.connect(self.dxl_control_diag.open)
 
         self.preset_diag.enable_preset_mode_btn.clicked.connect(
             lambda: self.ik_diag.ikEnableBtn.setChecked(False)

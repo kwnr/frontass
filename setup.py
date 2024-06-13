@@ -17,7 +17,7 @@ setup(
         'frontass.ui_movegroup', 'frontass.ui_fig_select_diag',
         'frontass.ui_pose_iterator', 'frontass.ui_preset_diag',
         'frontass.ui_pump_config_diag', 'frontass.ui_state_diag',
-        'frontass.utils'],
+        'frontass.ui_dxl_control', 'frontass.utils'],
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='kwnr',

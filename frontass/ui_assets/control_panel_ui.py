@@ -675,29 +675,37 @@ class Ui_MainWindow(object):
         self.func_btn_frame.setFrameShadow(QFrame.Shadow.Raised)
         self.gridLayoutWidget = QWidget(self.func_btn_frame)
         self.gridLayoutWidget.setObjectName(u"gridLayoutWidget")
-        self.gridLayoutWidget.setGeometry(QRect(10, 10, 211, 101))
+        self.gridLayoutWidget.setGeometry(QRect(10, 10, 311, 101))
         self.gridLayout = QGridLayout(self.gridLayoutWidget)
         self.gridLayout.setSpacing(20)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(10, 10, 10, 10)
-        self.ik_mode_btn = QPushButton(self.gridLayoutWidget)
-        self.ik_mode_btn.setObjectName(u"ik_mode_btn")
-        self.ik_mode_btn.setEnabled(True)
+        self.start_pose_iteration_btn = QPushButton(self.gridLayoutWidget)
+        self.start_pose_iteration_btn.setObjectName(u"start_pose_iteration_btn")
+        self.start_pose_iteration_btn.setEnabled(True)
         sizePolicy2 = QSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Preferred)
         sizePolicy2.setHorizontalStretch(0)
         sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.start_pose_iteration_btn.sizePolicy().hasHeightForWidth())
+        self.start_pose_iteration_btn.setSizePolicy(sizePolicy2)
+
+        self.gridLayout.addWidget(self.start_pose_iteration_btn, 0, 0, 1, 1)
+
+        self.ik_mode_btn = QPushButton(self.gridLayoutWidget)
+        self.ik_mode_btn.setObjectName(u"ik_mode_btn")
+        self.ik_mode_btn.setEnabled(True)
         sizePolicy2.setHeightForWidth(self.ik_mode_btn.sizePolicy().hasHeightForWidth())
         self.ik_mode_btn.setSizePolicy(sizePolicy2)
 
         self.gridLayout.addWidget(self.ik_mode_btn, 0, 1, 1, 1)
 
-        self.start_pose_iteration_btn = QPushButton(self.gridLayoutWidget)
-        self.start_pose_iteration_btn.setObjectName(u"start_pose_iteration_btn")
-        self.start_pose_iteration_btn.setEnabled(True)
-        sizePolicy2.setHeightForWidth(self.start_pose_iteration_btn.sizePolicy().hasHeightForWidth())
-        self.start_pose_iteration_btn.setSizePolicy(sizePolicy2)
+        self.dxlControlBtn = QPushButton(self.gridLayoutWidget)
+        self.dxlControlBtn.setObjectName(u"dxlControlBtn")
+        self.dxlControlBtn.setEnabled(True)
+        sizePolicy2.setHeightForWidth(self.dxlControlBtn.sizePolicy().hasHeightForWidth())
+        self.dxlControlBtn.setSizePolicy(sizePolicy2)
 
-        self.gridLayout.addWidget(self.start_pose_iteration_btn, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.dxlControlBtn, 0, 2, 1, 1)
 
         self.tr_left_forward_bar = QProgressBar(self.centralwidget)
         self.tr_left_forward_bar.setObjectName(u"tr_left_forward_bar")
@@ -855,11 +863,13 @@ class Ui_MainWindow(object):
         self.r3_power_btn.setText("")
         self.show_state_btn.setText(QCoreApplication.translate("MainWindow", u"Show Robot State", None))
         self.preset_mode_btn.setText(QCoreApplication.translate("MainWindow", u"Enter Preset Mode", None))
-        self.ik_mode_btn.setText(QCoreApplication.translate("MainWindow", u"IK\n"
-"Mode", None))
         self.start_pose_iteration_btn.setText(QCoreApplication.translate("MainWindow", u"Start\n"
 "Pose\n"
 "Iteration", None))
+        self.ik_mode_btn.setText(QCoreApplication.translate("MainWindow", u"IK\n"
+"Mode", None))
+        self.dxlControlBtn.setText(QCoreApplication.translate("MainWindow", u"DXL\n"
+"Control", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Track\n"
 "Left", None))
         self.label_21.setText(QCoreApplication.translate("MainWindow", u"Track\n"
