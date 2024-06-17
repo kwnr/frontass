@@ -20,6 +20,7 @@ from ui_preset_diag import UIPresetDiag
 from ui_pose_iterator import UIPoseIterator
 from ui_movegroup import UIMoveGroup
 from ui_dxl_control import UIDXLControl
+from ui_manual_volt_control import UIManualVolt
 from utils import BlitManager
 
 import rclpy
@@ -548,6 +549,9 @@ class UI(QMainWindow, Ui_MainWindow):
         self.dxl_control_diag = UIDXLControl(self, node=self.node)
         self.dxlControlBtn.clicked.connect(self.dxl_control_diag.open)
 
+        self.manual_volt_diag = UIManualVolt(self, node=self.node)
+        self.manualVoltControlBtn.clicked.connect(self.manual_volt_diag.show)
+
         self.preset_diag.enable_preset_mode_btn.clicked.connect(
             lambda: self.ik_diag.ikEnableBtn.setChecked(False)
             )
@@ -726,7 +730,7 @@ class UI(QMainWindow, Ui_MainWindow):
     @Slot()
     def pub_hold_toggle(self, btn: QPushButton, tgt: np.ndarray, idx: int, pub):
         tgt[idx] = not btn.isChecked()
-        pub.publish(Hold(enabled=self.is_on_hold))
+        pub.publish(Hold(enabled=self.is_on_hold.tolist()))
 
     @Slot()
     def get_lineedit_text(self, btn: QLineEdit, store: list):

@@ -5,7 +5,7 @@ from rclpy.node import Node
 import numpy as np
 
 
-class UIMoveGroup(QDialog, Ui_Dialog):
+class UIManualVolt(QDialog, Ui_Dialog):
     def __init__(self, *args, **kwargs):
         super().__init__(*args)
         self.setupUi(self)
@@ -56,14 +56,13 @@ class UIMoveGroup(QDialog, Ui_Dialog):
     def enable_btn_toggle_event(self, idx, data):
         self.enabled[idx] = data
         msg = ManualVolt()
-        msg.override_enabled = self.enabled
-        msg.volt_override = self.value
+        msg.override_enabled = self.enabled.tolist()
+        msg.volt_override = self.value.tolist()
         self.publisher.publish(msg)
 
     def spinbox_changed_event(self, idx, data):
         self.value[idx] = data
         msg = ManualVolt()
-        msg.override_enabled = self.enabled
-        msg.volt_override = self.value
+        msg.override_enabled = self.enabled.tolist()
+        msg.volt_override = self.value.tolist()
         self.publisher.publish(msg)
-
