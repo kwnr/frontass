@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>418</width>
-    <height>414</height>
+    <height>443</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,7 +36,7 @@ QSlider::sub-page:vertical {
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>149</y>
+     <y>179</y>
      <width>171</width>
      <height>211</height>
     </rect>
@@ -80,7 +80,7 @@ QSlider::sub-page:vertical {
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>60</y>
+     <y>90</y>
      <width>51</width>
      <height>81</height>
     </rect>
@@ -88,12 +88,15 @@ QSlider::sub-page:vertical {
    <property name="text">
     <string>I</string>
    </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
   </widget>
   <widget class="QPushButton" name="neutBtn">
    <property name="geometry">
     <rect>
      <x>80</x>
-     <y>60</y>
+     <y>90</y>
      <width>51</width>
      <height>81</height>
     </rect>
@@ -112,7 +115,7 @@ QSlider::sub-page:vertical {
    <property name="geometry">
     <rect>
      <x>140</x>
-     <y>60</y>
+     <y>90</y>
      <width>51</width>
      <height>81</height>
     </rect>
@@ -120,12 +123,15 @@ QSlider::sub-page:vertical {
    <property name="text">
     <string>II</string>
    </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
   </widget>
   <widget class="QPushButton" name="trackBtn">
    <property name="geometry">
     <rect>
      <x>280</x>
-     <y>60</y>
+     <y>90</y>
      <width>51</width>
      <height>81</height>
     </rect>
@@ -144,7 +150,7 @@ QSlider::sub-page:vertical {
    <property name="geometry">
     <rect>
      <x>340</x>
-     <y>60</y>
+     <y>90</y>
      <width>51</width>
      <height>81</height>
     </rect>
@@ -160,7 +166,7 @@ QSlider::sub-page:vertical {
    <property name="geometry">
     <rect>
      <x>220</x>
-     <y>60</y>
+     <y>90</y>
      <width>51</width>
      <height>81</height>
     </rect>
@@ -176,7 +182,7 @@ QSlider::sub-page:vertical {
    <property name="geometry">
     <rect>
      <x>220</x>
-     <y>149</y>
+     <y>179</y>
      <width>171</width>
      <height>211</height>
     </rect>
@@ -220,7 +226,7 @@ QSlider::sub-page:vertical {
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>40</y>
+     <y>70</y>
      <width>51</width>
      <height>17</height>
     </rect>
@@ -236,7 +242,7 @@ QSlider::sub-page:vertical {
    <property name="geometry">
     <rect>
      <x>80</x>
-     <y>40</y>
+     <y>70</y>
      <width>51</width>
      <height>17</height>
     </rect>
@@ -252,7 +258,7 @@ QSlider::sub-page:vertical {
    <property name="geometry">
     <rect>
      <x>140</x>
-     <y>40</y>
+     <y>70</y>
      <width>51</width>
      <height>17</height>
     </rect>
@@ -268,7 +274,7 @@ QSlider::sub-page:vertical {
    <property name="geometry">
     <rect>
      <x>220</x>
-     <y>40</y>
+     <y>70</y>
      <width>51</width>
      <height>17</height>
     </rect>
@@ -284,7 +290,7 @@ QSlider::sub-page:vertical {
    <property name="geometry">
     <rect>
      <x>280</x>
-     <y>40</y>
+     <y>70</y>
      <width>51</width>
      <height>17</height>
     </rect>
@@ -300,7 +306,7 @@ QSlider::sub-page:vertical {
    <property name="geometry">
     <rect>
      <x>340</x>
-     <y>40</y>
+     <y>70</y>
      <width>51</width>
      <height>17</height>
     </rect>
@@ -316,7 +322,7 @@ QSlider::sub-page:vertical {
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>360</y>
+     <y>390</y>
      <width>171</width>
      <height>31</height>
     </rect>
@@ -332,7 +338,7 @@ QSlider::sub-page:vertical {
    <property name="geometry">
     <rect>
      <x>220</x>
-     <y>360</y>
+     <y>390</y>
      <width>171</width>
      <height>31</height>
     </rect>
@@ -345,7 +351,76 @@ TRIGGER</string>
     <set>Qt::AlignmentFlag::AlignCenter</set>
    </property>
   </widget>
+  <widget class="QPushButton" name="enableBtn">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>20</y>
+     <width>44</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>41</width>
+     <height>21</height>
+    </size>
+   </property>
+   <property name="baseSize">
+    <size>
+     <width>41</width>
+     <height>21</height>
+    </size>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{
+	background-color: none;
+	border-radius: 5%;
+}</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset resource="buttons.qrc">
+     <normaloff>:/toggle/off</normaloff>
+     <normalon>:/toggle/on</normalon>:/toggle/off</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>40</width>
+     <height>40</height>
+    </size>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_9">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>20</y>
+     <width>191</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Enable Manual DXL Control</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+  </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="buttons.qrc"/>
+ </resources>
  <connections/>
 </ui>

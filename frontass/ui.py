@@ -545,7 +545,7 @@ class UI(QMainWindow, Ui_MainWindow):
         self.ik_diag.finished.connect(self.ik_diag.timer_robot_position.stop)
         self.ik_diag.ik_traj_pos_changed.connect(self.publish_pose_override)
 
-        self.dxl_control_diag = UIDXLControl(self)
+        self.dxl_control_diag = UIDXLControl(self, node=self.node)
         self.dxlControlBtn.clicked.connect(self.dxl_control_diag.open)
 
         self.preset_diag.enable_preset_mode_btn.clicked.connect(
