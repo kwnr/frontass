@@ -4,6 +4,7 @@ from ui_assets.movegroup_ui import Ui_Dialog
 
 import numpy as np
 import pandas as pd
+import datetime
 from scipy.spatial.transform import Rotation
 
 from rclpy.node import Node
@@ -270,10 +271,9 @@ class UIMoveGroup(QDialog, Ui_Dialog):
         self.update_table(self.pose_df)
 
     def save(self):
-        if self.dialog.exec():
-            filename = self.dialog.selectedFiles()[0]
-            self.pose_df.to_csv(filename)
-            self.node.get_logger().info(f"Trajectory saved to {filename}")
+        filename = f"traj{datetime.datetime.now().strftime('%y-%m-%d_%H-%M-%S')}.csv"
+        self.pose_df.to_csv(filename)
+        self.node.get_logger().info(f"Trajectory saved to {filename}")
 
     def get_target_pose(self):
         x = self.targetXDoubleSpinBox.value() / 1000
