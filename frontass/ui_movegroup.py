@@ -67,48 +67,48 @@ class UIMoveGroup(QDialog, Ui_Dialog):
         self.callback_group = kwargs["callback_group"]
         self.sub_traj = self.node.create_subscription(
             DisplayTrajectory,
-            '/display_planned_path',
+            'display_planned_path',
             self.cb_sub_traj,
             10,
             callback_group=self.callback_group
             )
         self.pub_traj = self.node.create_publisher(
             DisplayTrajectory,
-            '/display_planned_path',
+            'display_planned_path',
             10,
             callback_group=self.callback_group
             )
         self.srv_get_interactive_marker = self.node.create_client(
             GetInteractiveMarkers,
-            ('/rviz_moveit_motion_planning_display/'
+            ('rviz_moveit_motion_planning_display/'
              + 'robot_interaction_interactive_marker_topic/get_interactive_markers'),
             callback_group=self.callback_group)
         self.srv_get_motion_plan = self.node.create_client(
             GetMotionPlan,
-            '/plan_kinematic_path',
+            'plan_kinematic_path',
             callback_group=self.callback_group
             )
 
         self.srv_get_planning_scene = self.node.create_client(
             GetPlanningScene,
-            '/get_planning_scene',
+            'get_planning_scene',
             callback_group=self.callback_group
             )
         self.sub_joint_state = self.node.create_subscription(
             JointState,
-            '/joint_states',
+            'joint_states',
             self.cb_sub_joint_state,
             10,
             callback_group=self.callback_group
             )
         self.srv_query_planner_interface = self.node.create_client(
             QueryPlannerInterfaces,
-            '/query_planner_interface',
+            'query_planner_interface',
             callback_group=self.callback_group
             )
         self.srv_compute_fk = self.node.create_client(
             GetPositionFK,
-            '/compute_fk',
+            'compute_fk',
             callback_group=self.callback_group
         )
 
