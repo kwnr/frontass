@@ -394,28 +394,17 @@ class UIMoveGroup(QDialog, Ui_Dialog):
     def build_motion_plan(self, pipeline_id, planner_id, robot_state, goal_constraint):
         self.robot_state.joint_state.velocity = np.zeros_like(
             self.robot_state.joint_state.velocity, dtype=float).tolist()
-        if planner_id == 'LIN':
-            motion_plan_req = MotionPlanRequest(
-                start_state=self.robot_state,
-                goal_constraints=[goal_constraint],
-                pipeline_id=pipeline_id,
-                planner_id=planner_id,
-                group_name='right_arm',
-                num_planning_attempts=10,
-                allowed_planning_time=3.,
-                max_velocity_scaling_factor=0.1,
-                max_acceleration_scaling_factor=0.1,
-                )
-        else:
-            motion_plan_req = MotionPlanRequest(
-                start_state=self.robot_state,
-                goal_constraints=[goal_constraint],
-                pipeline_id=pipeline_id,
-                planner_id=planner_id,
-                group_name='right_arm',
-                num_planning_attempts=10,
-                allowed_planning_time=3.,
-                max_velocity_scaling_factor=1.0,
-                max_acceleration_scaling_factor=0.75,
+        vel_scale = self.velScaleSpinBox.value()
+        acc_scale = self.accScaleSpinBox.value()
+        motion_plan_req = MotionPlanRequest(
+            start_state=self.robot_state,
+            goal_constraints=[goal_constraint],
+            pipeline_id=pipeline_id,
+            planner_id=planner_id,
+            group_name='right_arm',
+            num_planning_attempts=10,
+            allowed_planning_time=3.,
+            max_velocity_scaling_factor=vel_scale,
+            max_acceleration_scaling_factor=acc_scale,
             )
         return motion_plan_req

@@ -298,6 +298,24 @@ class Ui_Dialog(object):
         self.getCurrentPoseBtn = QPushButton(Dialog)
         self.getCurrentPoseBtn.setObjectName(u"getCurrentPoseBtn")
         self.getCurrentPoseBtn.setGeometry(QRect(380, 100, 161, 41))
+        self.velScaleSpinBox = QDoubleSpinBox(Dialog)
+        self.velScaleSpinBox.setObjectName(u"velScaleSpinBox")
+        self.velScaleSpinBox.setGeometry(QRect(380, 170, 65, 26))
+        self.velScaleSpinBox.setMaximum(1.000000000000000)
+        self.velScaleSpinBox.setSingleStep(0.100000000000000)
+        self.velScaleSpinBox.setValue(0.100000000000000)
+        self.accScaleSpinBox = QDoubleSpinBox(Dialog)
+        self.accScaleSpinBox.setObjectName(u"accScaleSpinBox")
+        self.accScaleSpinBox.setGeometry(QRect(480, 170, 65, 26))
+        self.accScaleSpinBox.setMaximum(1.000000000000000)
+        self.accScaleSpinBox.setSingleStep(0.100000000000000)
+        self.accScaleSpinBox.setValue(0.100000000000000)
+        self.label_3 = QLabel(Dialog)
+        self.label_3.setObjectName(u"label_3")
+        self.label_3.setGeometry(QRect(380, 150, 71, 17))
+        self.label_4 = QLabel(Dialog)
+        self.label_4.setObjectName(u"label_4")
+        self.label_4.setGeometry(QRect(480, 150, 71, 17))
 
         self.retranslateUi(Dialog)
 
@@ -365,5 +383,7 @@ class Ui_Dialog(object):
         self.yawLabel.setText(QCoreApplication.translate("Dialog", u"Yaw", None))
         self.label.setText(QCoreApplication.translate("Dialog", u"Current Pose", None))
         self.getCurrentPoseBtn.setText(QCoreApplication.translate("Dialog", u"Get Current Pose", None))
+        self.label_3.setText(QCoreApplication.translate("Dialog", u"Vel. Scale", None))
+        self.label_4.setText(QCoreApplication.translate("Dialog", u"Acc. Scale", None))
     # retranslateUi
 
