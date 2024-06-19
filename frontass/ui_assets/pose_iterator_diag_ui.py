@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'pose_iterator_diag.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.3.0
+## Created by: Qt User Interface Compiler version 6.7.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -117,7 +117,7 @@ class Ui_Dialog(object):
         self.enabled_btn.setObjectName(u"enabled_btn")
         self.enabled_btn.setEnabled(True)
         self.enabled_btn.setGeometry(QRect(80, 20, 41, 30))
-        sizePolicy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.enabled_btn.sizePolicy().hasHeightForWidth())

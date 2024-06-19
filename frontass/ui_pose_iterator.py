@@ -1,38 +1,46 @@
-from PySide6.QtCore import QDir, QTimer
-from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QDialog, QFileDialog, QTableWidgetItem
-from ui_assets.pose_iterator_diag_ui import Ui_Dialog
-from ass_msgs.msg import PoseIteration
-
 import pandas as pd
 import numpy as np
 import time
 
+from rclpy.node import Node
+from PySide6.QtCore import QTimer
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QDialog, QFileDialog, QTableWidgetItem
+from ui_assets.pose_iterator_diag_ui import Ui_Dialog
+from ass_msgs.msg import ARMstrongTrajectory, ARMstrongTrajectoryEnabled, ARMstrongTrajectoryExecution
+from trajectory_msgs.msg import JointTrajectoryPoint
+
 
 class UIPoseIterator(QDialog, Ui_Dialog):
-    def __init__(self, parent, publisher):
-        super().__init__(parent)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args)
         self.setupUi(self)
         self.file_path = ""
         self.pose_df = pd.DataFrame()
         self.joint_pos = np.zeros(16)
         self.tgt_pose = np.zeros(16)
-        self.exec_time = 0
+        self.time_from_start = 0
         self.wait_time = 0
         self.trigger = 0.
 
-        self.pose_path_btn.clicked.connect(self.open_csv_file)
+        self.node: Node = kwargs["node"]
+        self.posePathBtn.clicked.connect(self.open_csv_file)
 
         self.converge_criterion = 0.3
-        self.conv_crit_line.setText(str(self.converge_criterion))
-        self.conv_crit_line.editingFinished.connect(
-            lambda: self.set_converge_criterion(self.conv_crit_line.text())
+        self.convCritLineEdit.setText(str(self.converge_criterion))
+        self.convCritLineEdit.editingFinished.connect(
+            lambda: self.set_converge_criterion(self.convCritLineEdit.text())
         )
 
-        self.publisher = publisher
-        self.enabled_btn.clicked.connect(self.publish)
-        self.finished.connect(lambda: self.enabled_btn.setChecked(False))
-        self.finished.connect(self.publish)
+        self.sendBtn.clicked.connect(self.cb_send)
+        self.execBtn.clicked.connect(self.cb_exec)
+
+        self.arm_traj_enabled_publisher = self.node.create_publisher(ARMstrongTrajectoryEnabled,
+                                                                     "armstrong_traj_enabled", 10)
+        self.arm_traj_publisher = self.node.create_publisher(ARMstrongTrajectory, "armstrong_traj", 10)
+        self.arm_traj_execution_publisher = self.node.create_publisher(ARMstrongTrajectoryExecution,
+                                                                       "armstrong_traj_execution", 10)
+        self.finished.connect(lambda: self.enabledBtn.setChecked(False))
         self.on_wait = False
         self.pos_start_time = -1
         self.progress = 0.0
@@ -42,41 +50,35 @@ class UIPoseIterator(QDialog, Ui_Dialog):
         self.trajectory = np.zeros((16, 1))
         self.traj_idx = 0
 
-        self.pose_timer = QTimer(self)
-        self.pose_timer.setSingleShot(True)
-        self.pose_timer.timeout.connect(self.next_pose)
-
-        self.next_pose_btn.clicked.connect(self.next_pose)
-
     def open_csv_file(self):
+        """
+        header of csv file must be
+        name, l1, l2 ,l3, ..., r7, r8, trigger,     time_from_start
+        str , float (deg), ..., float, int(0~1000), float
+        """
         self.file_path, _ = QFileDialog.getOpenFileName(
-            self, caption="Select Pose File", filter="csv files (*.csv)"
+            self, caption="Select Pose File", filter="csv files (*.csv)")
+        self.tgt_pose = self.pose_df.iloc[:16, 0]
+        self.trigger = self.pose_df.iloc[16, 0]
+        self.time_from_start = self.pose_df.iloc[17, 0]
+
+        cx = self.iterTable.columnCount() - 1
+        if self.pose_df.shape[1] > cx:
+            for i in range(self.pose_df.shape[1] - cx):
+                self.iterTable.insertColumn(cx + i)
+        elif self.pose_df.shape[1] < cx:
+            for i in range(cx - self.pose_df.shape[1]):
+                self.iterTable.removeColumn(cx - i)
+
+        self.iterTable.setHorizontalHeaderLabels(
+            ["Now", *self.pose_df.columns.astype(str)]
         )
-        if self.file_path != "":
-            directory = QDir(self.file_path)
-            self.pose_path_lineedit.setText(directory.absolutePath())
-            self.pose_df = pd.read_csv(self.file_path, header=0, index_col="NAME")
-            self.pose_df = self.pose_df.T
-            self.tgt_pose = self.pose_df.iloc[:16, 0]
-            self.exec_time = self.pose_df.iloc[17, 0]
 
-            cx = self.iter_table.columnCount() - 1
-            if self.pose_df.shape[1] > cx:
-                for i in range(self.pose_df.shape[1] - cx):
-                    self.iter_table.insertColumn(cx + i)
-            elif self.pose_df.shape[1] < cx:
-                for i in range(cx - self.pose_df.shape[1]):
-                    self.iter_table.removeColumn(cx - i)
-
-            self.iter_table.setHorizontalHeaderLabels(
-                ["Now", *self.pose_df.columns.astype(str)]
-            )
-
-            for col in range(self.pose_df.shape[1]):
-                for row, pose in enumerate(self.pose_df.iloc[:, col]):
-                    self.iter_table.setItem(
-                        row, col + 1, QTableWidgetItem(f"{pose:.2f}")
-                    )
+        for col in range(self.pose_df.shape[1]):
+            for row, pose in enumerate(self.pose_df.iloc[:, col]):
+                self.iterTable.setItem(
+                    row, col + 1, QTableWidgetItem(f"{pose:.2f}")
+                )
 
     def update_table(self):
         if self.pose_df.shape[1] == 0:
@@ -84,14 +86,13 @@ class UIPoseIterator(QDialog, Ui_Dialog):
         for i in range(18):
             for col in range(self.pose_df.shape[1]):
                 for row, pose in enumerate(self.pose_df.iloc[:, col]):
-                    self.iter_table.setItem(
+                    self.iterTable.setItem(
                         row, col + 1, QTableWidgetItem(f"{pose:.2f}")
                     )
         self.tgt_pose = self.pose_df.iloc[:16, 0]
         self.trigger = self.pose_df.loc["trigger"].iloc[0]
-        self.exec_time = self.pose_df.loc["exec_time"].iloc[0]
-        self.wait_time = self.pose_df.loc["wait_time"].iloc[0]
-        self.iter_table.setHorizontalHeaderLabels(
+        self.time_from_start = self.pose_df.loc["time_from_start"].iloc[0]
+        self.iterTable.setHorizontalHeaderLabels(
             ["Now", *self.pose_df.columns.astype(str)]
         )
 
@@ -101,16 +102,16 @@ class UIPoseIterator(QDialog, Ui_Dialog):
             item.setBackground(
                 QColor(0x00, 0xCD, 0x00) if converged[i] else QColor(0xFF, 0xFF, 0xFF)
             )
-            self.iter_table.setItem(i, 0, item)
+            self.iterTable.setItem(i, 0, item)
         self.progress = self.traj_idx / self.trajectory.shape[0]
         item = QTableWidgetItem(f"{self.progress * 100:.2f}%")
-        self.iter_table.setItem(17, 0, item)
+        self.iterTable.setItem(17, 0, item)
         item = QTableWidgetItem(
             f"{time.time()-self.pos_start_time:.2f}"
             if self.pos_start_time != -1
             else ""
         )
-        self.iter_table.setItem(18, 0, item)
+        self.iterTable.setItem(18, 0, item)
 
     def determine_converged(self, pos: np.ndarray, tgt_pose: np.ndarray) -> np.ndarray:
         if tgt_pose.size != 0:
@@ -124,85 +125,32 @@ class UIPoseIterator(QDialog, Ui_Dialog):
         else:
             return np.array([False] * 16)
 
-    # TODO: modify as subprocess loop from timer callback
-    def timer_loop(self, pos: np.ndarray):
-        self.joint_pos = pos
-        converged = self.determine_converged(self.joint_pos, self.tgt_pose)
-        self.update_pos_col(pos, converged)
-        if self.enabled_btn.isChecked():
-            if not self.is_traj_completed and not self.on_traj_exec:
-                self.on_traj_exec = True
-                self.trajectory = self.make_trajectory(self.tgt_pose, self.exec_time)
-                self.traj_idx = 0
-                self.time_started = time.time()
-                self.publisher.publish(
-                    PoseIteration(
-                        enabled=self.enabled_btn.isChecked(),
-                        poses=self.trajectory[self.traj_idx],
-                        trigger=self.trigger,)
-                )
-            elif not self.is_traj_completed:
-                if self.traj_idx < len(self.trajectory):
-                    self.publisher.publish(
-                        PoseIteration(
-                            enabled=self.enabled_btn.isChecked(),
-                            poses=self.trajectory[self.traj_idx],
-                            trigger=self.trigger)
-                    )
-                    self.traj_idx = int(
-                        (time.time() - self.time_started) / self.exec_time
-                        * len(self.trajectory)
-                    )
-                else:
-                    self.publisher.publish(
-                        PoseIteration(
-                            enabled=self.enabled_btn.isChecked(),
-                            poses=self.trajectory[-1],
-                            trigger=self.trigger
-                            )
-                    )
-                    self.is_traj_completed = True
-                    self.on_traj_exec = False
-            elif converged.all() and not self.on_wait:
-                self.on_wait = True
-                t_wait = (
-                    self.pose_df.loc["wait_time"][0] * 1000
-                    if ~np.isnan(self.pose_df.loc["wait_time"][0])
-                    else 0
-                )
-                self.pos_start_time = time.time()
-                self.pose_timer.setInterval(t_wait)
-                self.pose_timer.start()
-            elif self.on_wait and not converged.all():
-                self.pose_timer.stop()
-                self.on_wait = False
-                self.pos_start_time = -1
+    def build_message(self, data: pd.DataFrame):
+        points = []
+        point_name = list(data.columns)
+        trigger = list(data["trigger"])
+        for i, col in enumerate(data.columns):
+            point = JointTrajectoryPoint()
+            point.positions = data[col][:16].tolist()
+            point.time_from_start = float(data["time_from_start"][i])
+            points.append(point)
+        msg = ARMstrongTrajectory()
+        msg.point_name = point_name
+        msg.points = points
+        msg.trigger = trigger
+        return msg
 
-    def next_pose(self):
-        col = self.pose_df.columns
-        self.pose_df = pd.concat([self.pose_df, self.pose_df.pop(col[0])], axis=1)
-        self.tgt_pose = self.pose_df.iloc[:, 0]
-        self.update_table()
-        self.publish()
-        self.on_wait = False
-        self.is_traj_completed = False
-        self.progress = 0.0
-        self.pos_start_time = -1
+    def cb_send(self):
+        msg = self.build_message(self.pose_df)
+        self.arm_traj_publisher.publish(msg)
+        self.statusLabel.setText("STATUS: sent and ready")
 
-    def make_trajectory(self, tgt_pose, t):
-        step = int(t * 10) + 2
-        trajectory = np.linspace(self.joint_pos, tgt_pose, step)
-        return trajectory
-
-    def publish(self):
-        enabled = self.enabled_btn.isChecked()
-        self.publisher.publish(
-            PoseIteration(
-                enabled=enabled,
-                poses=self.tgt_pose,
-                trigger=self.trigger
-                )
-        )
+    def cb_exec(self):
+        msg = ARMstrongTrajectoryExecution()
+        msg.execute = True
+        self.arm_traj_execution_publisher.publish(msg)
+        self.statusLabel.setText("STATUS: executing...")
+        self.execBtn.setDisabled(True)
 
     def set_converge_criterion(self, val):
         self.converge_criterion = float(val)

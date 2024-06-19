@@ -10,10 +10,10 @@ from scipy.spatial.transform import Rotation
 from rclpy.node import Node
 from rclpy.qos import qos_profile_system_default
 
-from ass_msgs.msg import TrajectoryExecution
 from sensor_msgs.msg import JointState
 from trajectory_msgs.msg import JointTrajectoryPoint
 from geometry_msgs.msg import Pose
+from ass_msgs.msg import PoseIteration, TrajectoryPoint, TrajectoryEnabled, TrajectoryExecution
 from moveit_msgs.msg import (DisplayTrajectory,
                              RobotTrajectory,
                              MotionPlanRequest,
@@ -22,12 +22,11 @@ from moveit_msgs.msg import (DisplayTrajectory,
                              Constraints,
                              PositionConstraint,
                              OrientationConstraint)
+
 from moveit_msgs.srv import (GetMotionPlan,
                              GetPlanningScene,
                              QueryPlannerInterfaces,
                              GetPositionFK)
-
-from ass_msgs.msg import PoseIteration, TrajectoryPoint, TrajectoryEnabled
 from visualization_msgs.srv import GetInteractiveMarkers
 
 from typing import List
@@ -272,7 +271,7 @@ class UIMoveGroup(QDialog, Ui_Dialog):
 
     def save(self):
         filename = f"traj{datetime.datetime.now().strftime('%y-%m-%d_%H-%M-%S')}.csv"
-        self.pose_df.to_csv(filename)
+        self.pose_df.T.to_csv(filename)
         self.node.get_logger().info(f"Trajectory saved to {filename}")
 
     def get_target_pose(self):
@@ -315,6 +314,7 @@ class UIMoveGroup(QDialog, Ui_Dialog):
             self.planStatusLabel.setText("PLAN FAILED")
 
     def cb_execution_with_traj(self):
+        self.execBtn.setDisabled(True)
         self.traj_exec_publisher.publish(TrajectoryExecution(enabled=True))
 
     def cb_execution(self):

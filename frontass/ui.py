@@ -343,14 +343,10 @@ class UI(QMainWindow, Ui_MainWindow):
         self.pose_iter_publisher = self.node.create_publisher(
             PoseIteration, "pose_iter", qos_profile_system_default, callback_group=self.callback_group
         )
-        self.pose_iteration_diag = UIPoseIterator(self, self.pose_iter_publisher)
+        self.pose_iteration_diag = UIPoseIterator(self, node=self.node)
         self.start_pose_iteration_btn.clicked.connect(self.pose_iteration_diag.show)
 
         self.start_pose_iteration_btn.clicked.connect(self.pose_iter_timer.start)
-        self.pose_iter_timer.timeout.connect(
-            lambda: self.pose_iteration_diag.timer_loop(self.joint_pos)
-        )
-        self.pose_iteration_diag.finished.connect(self.pose_iter_timer.stop)
 
         self.start_time = self.node.get_clock().now().seconds_nanoseconds()[0]
         # graph - arm
@@ -544,7 +540,6 @@ class UI(QMainWindow, Ui_MainWindow):
             lambda: self.ik_diag.cb_movegroup(self.joint_pos))
         self.ik_mode_btn.clicked.connect(self.ik_diag.timer_robot_position.start)
         self.ik_diag.finished.connect(self.ik_diag.timer_robot_position.stop)
-        self.ik_diag.ik_traj_pos_changed.connect(self.publish_pose_override)
 
         self.dxl_control_diag = UIDXLControl(self, node=self.node)
         self.dxlControlBtn.clicked.connect(self.dxl_control_diag.open)
@@ -556,30 +551,20 @@ class UI(QMainWindow, Ui_MainWindow):
             lambda: self.ik_diag.ikEnableBtn.setChecked(False)
             )
         self.preset_diag.enable_preset_mode_btn.clicked.connect(
-            lambda: self.pose_iteration_diag.enabled_btn.setChecked(False)
+            lambda: self.pose_iteration_diag.enabledBtn.setChecked(False)
             )
-        self.pose_iteration_diag.enabled_btn.clicked.connect(
+        self.pose_iteration_diag.enabledBtn.clicked.connect(
             lambda: self.preset_diag.enable_preset_mode_btn.setChecked(False)
             )
-        self.pose_iteration_diag.enabled_btn.clicked.connect(
+        self.pose_iteration_diag.enabledBtn.clicked.connect(
             lambda: self.ik_diag.ikEnableBtn.setChecked(False)
             )
         self.ik_diag.ikEnableBtn.clicked.connect(
             lambda: self.preset_diag.enable_preset_mode_btn.setChecked(False)
             )
         self.ik_diag.ikEnableBtn.clicked.connect(
-            lambda: self.pose_iteration_diag.enabled_btn.setChecked(False)
+            lambda: self.pose_iteration_diag.enabledBtn.setChecked(False)
             )
-
-    def publish_pose_override(self, value):
-        message = PoseIteration()
-        message.enabled = value[0]
-        message.poses = value[1]
-        if len(value) < 3:
-            pass
-        else:
-            pass
-        self.pose_iter_publisher.publish(message)
 
     def cb_pump_config_accepted(self):
         self.pump_tgt_speed = int(self.pump_config_diag.manualTargetRPMLineEdit.text())
