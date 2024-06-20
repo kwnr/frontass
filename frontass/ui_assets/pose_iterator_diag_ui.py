@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'pose_iterator_diag.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.7.0
+## Created by: Qt User Interface Compiler version 6.3.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -106,18 +106,18 @@ class Ui_Dialog(object):
         self.iterTable.verticalHeader().setStretchLastSection(True)
         self.label = QLabel(Dialog)
         self.label.setObjectName(u"label")
-        self.label.setGeometry(QRect(10, 60, 67, 30))
-        self.posePathLineEdit = QLineEdit(Dialog)
-        self.posePathLineEdit.setObjectName(u"posePathLineEdit")
-        self.posePathLineEdit.setGeometry(QRect(90, 60, 391, 30))
-        self.posePathBtn = QToolButton(Dialog)
-        self.posePathBtn.setObjectName(u"posePathBtn")
-        self.posePathBtn.setGeometry(QRect(490, 60, 31, 30))
-        self.enabledBtn = QPushButton(Dialog)
-        self.enabledBtn.setObjectName(u"enabledBtn")
-        self.enabledBtn.setEnabled(True)
-        self.enabledBtn.setGeometry(QRect(80, 20, 41, 30))
-        sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        self.label.setGeometry(QRect(10, 70, 67, 25))
+        self.pose_path_lineedit = QLineEdit(Dialog)
+        self.pose_path_lineedit.setObjectName(u"pose_path_lineedit")
+        self.pose_path_lineedit.setGeometry(QRect(90, 70, 601, 25))
+        self.pose_path_btn = QToolButton(Dialog)
+        self.pose_path_btn.setObjectName(u"pose_path_btn")
+        self.pose_path_btn.setGeometry(QRect(700, 70, 26, 25))
+        self.enabled_btn = QPushButton(Dialog)
+        self.enabled_btn.setObjectName(u"enabled_btn")
+        self.enabled_btn.setEnabled(True)
+        self.enabled_btn.setGeometry(QRect(80, 20, 41, 30))
+        sizePolicy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.enabledBtn.sizePolicy().hasHeightForWidth())
