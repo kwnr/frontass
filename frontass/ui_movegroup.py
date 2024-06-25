@@ -8,12 +8,13 @@ import datetime
 from scipy.spatial.transform import Rotation
 
 from rclpy.node import Node
-from rclpy.qos import qos_profile_system_default
+from rclpy.qos import qos_profile_services_default
 
 from ass_msgs.msg import TrajectoryExecution
 from sensor_msgs.msg import JointState
 from trajectory_msgs.msg import JointTrajectoryPoint
 from geometry_msgs.msg import Pose
+from shape_msgs.msg import SolidPrimitive
 from moveit_msgs.msg import (DisplayTrajectory,
                              RobotTrajectory,
                              MotionPlanRequest,
@@ -21,13 +22,13 @@ from moveit_msgs.msg import (DisplayTrajectory,
                              RobotState,
                              Constraints,
                              PositionConstraint,
-                             OrientationConstraint)
+                             OrientationConstraint,)
 from moveit_msgs.srv import (GetMotionPlan,
                              GetPlanningScene,
                              QueryPlannerInterfaces,
                              GetPositionFK)
 
-from ass_msgs.msg import PoseIteration, TrajectoryPoint, TrajectoryEnabled
+from ass_msgs.msg import PoseIteration, TrajectoryPoint, TrajectoryEnabled, TrajectoryFeedback, DXLCommand
 from visualization_msgs.srv import GetInteractiveMarkers
 
 from typing import List
@@ -50,6 +51,8 @@ class UIMoveGroup(QDialog, Ui_Dialog):
         self.ikEnableBtn.toggled.connect(self.set_ik_enabled)
 
         self.pose_df = pd.DataFrame(np.zeros((16, 0)))
+        self.seq_idx = 0
+        self.on_sequence = False
 
         self.timer_execution = QTimer(self)
         self.timer_execution.setInterval(10)
@@ -59,6 +62,9 @@ class UIMoveGroup(QDialog, Ui_Dialog):
         self.planBtn.clicked.connect(self.plan)
         # self.execBtn.clicked.connect(self.timer_execution.start)
         self.execBtn.clicked.connect(self.cb_execution_with_traj)
+        self.filePathLineEdit.editingFinished.connect(self.load_file)
+        self.load_file()
+        self.startBtn.clicked.connect(self.cb_start)
 
         # set when execution started.
         # if execution finished or not started, then set to None
@@ -116,38 +122,49 @@ class UIMoveGroup(QDialog, Ui_Dialog):
         self.pose_iter_publisher = self.node.create_publisher(
             PoseIteration,
             "pose_iter",
-            qos_profile_system_default,
+            qos_profile_services_default,
             callback_group=self.callback_group
         )
         self.traj_point_publisher = self.node.create_publisher(
             TrajectoryPoint,
             "traj_point",
-            qos_profile_system_default,
+            qos_profile_services_default,
             callback_group=self.callback_group
         )
         self.planned_trajectory_publisher = self.node.create_publisher(
             MotionPlanResponse,
             "planned_trajectory",
-            qos_profile_system_default,
+            qos_profile_services_default,
             callback_group=self.callback_group
         )
         self.traj_exec_publisher = self.node.create_publisher(
             TrajectoryExecution,
             "traj_exec",
-            qos_profile_system_default
+            qos_profile_services_default
         )
         self.traj_enabled_publisher = self.node.create_publisher(
             TrajectoryEnabled,
             "traj_enabled",
-            qos_profile_system_default
+            qos_profile_services_default
+        )
+        self.traj_feedback_sub = self.node.create_subscription(
+            TrajectoryFeedback,
+            "traj_feedback",
+            callback=self.cb_traj_feedback,
+            qos_profile=qos_profile_services_default,
+        )
+        self.dxl_command_pub = self.node.create_publisher(
+            DXLCommand,
+            "dxl_command",
+            qos_profile_services_default
         )
 
         res = self.srv_query_planner_interface.call(QueryPlannerInterfaces.Request())
         self.planner_interface = res.planner_interfaces
         self.planner_interface.reverse()
-        pipeline_ids = [i.pipeline_id for i in self.planner_interface]
+        self.pipeline_ids = [i.pipeline_id for i in self.planner_interface]
 
-        self.planningPipelineCombo.addItems(pipeline_ids)
+        self.planningPipelineCombo.addItems(self.pipeline_ids)
         self.cb_planning_pipeline_combo_changed(0)
         self.planningPipelineCombo.currentIndexChanged.connect(
             self.cb_planning_pipeline_combo_changed
@@ -294,7 +311,7 @@ class UIMoveGroup(QDialog, Ui_Dialog):
         target_position, target_orientation = self.get_target_pose()
 
         goal_constraint = self.construct_link_constraints(
-            'link6_right', target_position, target_orientation, 0.01, 0.01)
+            'link6_right', target_position, target_orientation, 0.001, 0.001)
 
         motion_plan_request = self.build_motion_plan(pipeline_id,
                                                      planner_id,
@@ -310,12 +327,15 @@ class UIMoveGroup(QDialog, Ui_Dialog):
                 DisplayTrajectory(trajectory=[result.trajectory])
                 )
             self.planStatusLabel.setText("PLANNED")
+            self.node.get_logger().info("plan result sent")
             return self.trajectory
         else:
             self.planStatusLabel.setText("PLAN FAILED")
 
     def cb_execution_with_traj(self):
         self.traj_exec_publisher.publish(TrajectoryExecution(enabled=True))
+        self.planStatusLabel.setText("EXECUTING")
+        self.node.get_logger().info("execute command sent")
 
     def cb_execution(self):
         if self.time_exec_started is None:
@@ -354,6 +374,68 @@ class UIMoveGroup(QDialog, Ui_Dialog):
         message.point.time_from_start.nanosec = int(time_passed % 1e9)
         self.traj_point_publisher.publish(message)
 
+    def load_file(self):
+        file_path = self.filePathLineEdit.text()
+        self.seq_idx = 0
+        try:
+            self.sequence = pd.read_csv(file_path, header=0)
+            self.startBtn.setEnabled(True)
+            self.sequenceModeStatusLabel.setText("status: LOADED")
+            self.build_seq_table(self.sequence)
+        except FileNotFoundError as e:
+            self.sequenceModeStatusLabel.setText("status: LOAD FAILED")
+            self.node.get_logger().warn(e)
+
+    def build_seq_table(self, data: pd.DataFrame):
+        for i in range(self.sequenceTable.rowCount()):
+            self.sequenceTable.removeRow(0)
+        for i in range(data.shape[0]):
+            self.sequenceTable.insertRow(i)
+            for j in range(data.shape[1]):
+                item = QTableWidgetItem(f"{data.iloc[i, j]:.1f}")
+                self.sequenceTable.setItem(i, j, item)
+
+    def cb_start(self):
+        self.on_sequence = True
+        self.execute_sequence(self.seq_idx)
+
+    def execute_sequence(self, idx):
+        self.node.get_logger().info(f"executing {idx}")
+        self.getCurrentPoseBtn.click()
+        point = self.sequence.iloc[idx]
+
+        self.targetXDoubleSpinBox.setValue(point['x'])
+        self.targetYDoubleSpinBox.setValue(point['y'])
+        self.targetZDoubleSpinBox.setValue(point['z'])
+        self.targetRollDoubleSpinBox.setValue(point['roll'])
+        self.targetPitchDoubleSpinBox.setValue(point['pitch'])
+        self.targetYawDoubleSpinBox.setValue(point['yaw'])
+
+        self.velScaleSpinBox.setValue(point['speed'])
+        self.accScaleSpinBox.setValue(point['speed'])
+
+        self.dxl_command_pub.publish(DXLCommand(enabled=True, mode_toggle=1, right_lever=int(point["trig"])))
+
+        self.plan()
+        time.sleep(0.5)
+        self.cb_execution_with_traj()
+
+    def cb_traj_feedback(self, data: TrajectoryFeedback):
+        if data.finished:
+            self.planStatusLabel.setText("status: FINISHED")
+            self.execBtn.setDisabled(True)
+            if self.on_sequence:
+                self.seq_idx += 1
+                if self.seq_idx == self.sequence.shape[0]:
+                    self.seq_idx = 0
+                    self.sequenceModeStatusLabel.setText("status: FINISHED")
+                    self.on_sequence = False
+                    self.startBtn.setEnabled(True)
+                else:
+                    self.sequenceModeStatusLabel.setText(f"status: {self.seq_idx} / {self.sequence.shape[0]}")
+                    self.cb_start()
+                    time.sleep(self.sequence["time"].iloc[self.seq_idx])
+
     def construct_link_constraints(self,
                                    link_name: str,
                                    target_position: List[float],
@@ -369,12 +451,17 @@ class UIMoveGroup(QDialog, Ui_Dialog):
         pose.orientation.z = target_oritentaion[2]
         pose.orientation.w = target_oritentaion[3]
 
+        bv = SolidPrimitive()
+        bv.type = SolidPrimitive.SPHERE
+        bv.dimensions.append(position_tol)
+
         position_constraint = PositionConstraint()
         position_constraint.link_name = link_name
-        position_constraint.target_point_offset.x = position_tol
-        position_constraint.target_point_offset.y = position_tol
-        position_constraint.target_point_offset.z = position_tol
+        position_constraint.target_point_offset.x = 0.
+        position_constraint.target_point_offset.y = 0.
+        position_constraint.target_point_offset.z = 0.
         position_constraint.constraint_region.primitive_poses = [pose]
+        position_constraint.constraint_region.primitives = [bv]
         position_constraint.weight = 1.0
 
         orientation_constraint = OrientationConstraint()

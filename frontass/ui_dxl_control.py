@@ -85,7 +85,7 @@ class UIDXLControl(QDialog, Ui_Dialog):
 
         msg = DXLCommand()
         msg.enabled = is_enabled
-        msg.mode_toggle = -1
+        msg.mode_toggle = 1
         self.dxl_command_publisher.publish(msg)
 
     def track_click_event(self):
@@ -105,7 +105,7 @@ class UIDXLControl(QDialog, Ui_Dialog):
 
         msg = DXLCommand()
         msg.enabled = is_enabled
-        msg.mode_toggle = 1
+        msg.mode_toggle = -1
         self.dxl_command_publisher.publish(msg)
 
     def left_slider_release_event(self):

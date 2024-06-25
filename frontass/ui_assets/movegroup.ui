@@ -111,9 +111,9 @@
   <widget class="QTableWidget" name="iterTable">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>330</y>
-     <width>711</width>
+     <x>390</x>
+     <y>340</y>
+     <width>341</width>
      <height>541</height>
     </rect>
    </property>
@@ -661,6 +661,171 @@
    </property>
    <property name="text">
     <string>Acc. Scale</string>
+   </property>
+  </widget>
+  <widget class="QTableWidget" name="sequenceTable">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>470</y>
+     <width>341</width>
+     <height>411</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>341</width>
+     <height>0</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>341</width>
+     <height>16777215</height>
+    </size>
+   </property>
+   <property name="verticalScrollBarPolicy">
+    <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+   </property>
+   <property name="horizontalScrollBarPolicy">
+    <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+   </property>
+   <attribute name="horizontalHeaderVisible">
+    <bool>true</bool>
+   </attribute>
+   <attribute name="horizontalHeaderCascadingSectionResizes">
+    <bool>true</bool>
+   </attribute>
+   <attribute name="horizontalHeaderMinimumSectionSize">
+    <number>0</number>
+   </attribute>
+   <attribute name="horizontalHeaderDefaultSectionSize">
+    <number>37</number>
+   </attribute>
+   <attribute name="horizontalHeaderHighlightSections">
+    <bool>true</bool>
+   </attribute>
+   <attribute name="horizontalHeaderStretchLastSection">
+    <bool>true</bool>
+   </attribute>
+   <attribute name="verticalHeaderVisible">
+    <bool>false</bool>
+   </attribute>
+   <column>
+    <property name="text">
+     <string>x</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>y</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>z</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>roll</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>pitch</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>yaw</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>trig</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>time</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>speed</string>
+    </property>
+   </column>
+  </widget>
+  <widget class="QLineEdit" name="filePathLineEdit">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>360</y>
+     <width>271</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>~/ros2ws/src/frontass/frontass/sequence_files/test0.csv</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>360</y>
+     <width>61</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>file path</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="startBtn">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>400</y>
+     <width>161</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>START</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>340</y>
+     <width>341</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Sequence Mode</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="sequenceModeStatusLabel">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>410</y>
+     <width>171</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>status: NOT LOADED</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
    </property>
   </widget>
  </widget>

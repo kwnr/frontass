@@ -16,8 +16,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QComboBox, QDialog, QDoubleSpinBox,
-    QFormLayout, QHeaderView, QLabel, QPushButton,
-    QSizePolicy, QTableWidget, QTableWidgetItem, QWidget)
+    QFormLayout, QHeaderView, QLabel, QLineEdit,
+    QPushButton, QSizePolicy, QTableWidget, QTableWidgetItem,
+    QWidget)
 import buttons_rc
 
 class Ui_Dialog(object):
@@ -98,7 +99,7 @@ class Ui_Dialog(object):
         __qtablewidgetitem17 = QTableWidgetItem()
         self.iterTable.setVerticalHeaderItem(16, __qtablewidgetitem17)
         self.iterTable.setObjectName(u"iterTable")
-        self.iterTable.setGeometry(QRect(20, 330, 711, 541))
+        self.iterTable.setGeometry(QRect(390, 340, 341, 541))
         self.iterTable.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.iterTable.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.iterTable.verticalHeader().setStretchLastSection(True)
@@ -316,6 +317,57 @@ class Ui_Dialog(object):
         self.label_4 = QLabel(Dialog)
         self.label_4.setObjectName(u"label_4")
         self.label_4.setGeometry(QRect(480, 150, 71, 17))
+        self.sequenceTable = QTableWidget(Dialog)
+        if (self.sequenceTable.columnCount() < 9):
+            self.sequenceTable.setColumnCount(9)
+        __qtablewidgetitem18 = QTableWidgetItem()
+        self.sequenceTable.setHorizontalHeaderItem(0, __qtablewidgetitem18)
+        __qtablewidgetitem19 = QTableWidgetItem()
+        self.sequenceTable.setHorizontalHeaderItem(1, __qtablewidgetitem19)
+        __qtablewidgetitem20 = QTableWidgetItem()
+        self.sequenceTable.setHorizontalHeaderItem(2, __qtablewidgetitem20)
+        __qtablewidgetitem21 = QTableWidgetItem()
+        self.sequenceTable.setHorizontalHeaderItem(3, __qtablewidgetitem21)
+        __qtablewidgetitem22 = QTableWidgetItem()
+        self.sequenceTable.setHorizontalHeaderItem(4, __qtablewidgetitem22)
+        __qtablewidgetitem23 = QTableWidgetItem()
+        self.sequenceTable.setHorizontalHeaderItem(5, __qtablewidgetitem23)
+        __qtablewidgetitem24 = QTableWidgetItem()
+        self.sequenceTable.setHorizontalHeaderItem(6, __qtablewidgetitem24)
+        __qtablewidgetitem25 = QTableWidgetItem()
+        self.sequenceTable.setHorizontalHeaderItem(7, __qtablewidgetitem25)
+        __qtablewidgetitem26 = QTableWidgetItem()
+        self.sequenceTable.setHorizontalHeaderItem(8, __qtablewidgetitem26)
+        self.sequenceTable.setObjectName(u"sequenceTable")
+        self.sequenceTable.setGeometry(QRect(20, 470, 341, 411))
+        self.sequenceTable.setMinimumSize(QSize(341, 0))
+        self.sequenceTable.setMaximumSize(QSize(341, 16777215))
+        self.sequenceTable.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.sequenceTable.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.sequenceTable.horizontalHeader().setVisible(True)
+        self.sequenceTable.horizontalHeader().setCascadingSectionResizes(True)
+        self.sequenceTable.horizontalHeader().setMinimumSectionSize(0)
+        self.sequenceTable.horizontalHeader().setDefaultSectionSize(37)
+        self.sequenceTable.horizontalHeader().setHighlightSections(True)
+        self.sequenceTable.horizontalHeader().setStretchLastSection(True)
+        self.sequenceTable.verticalHeader().setVisible(False)
+        self.filePathLineEdit = QLineEdit(Dialog)
+        self.filePathLineEdit.setObjectName(u"filePathLineEdit")
+        self.filePathLineEdit.setGeometry(QRect(90, 360, 271, 25))
+        self.label_5 = QLabel(Dialog)
+        self.label_5.setObjectName(u"label_5")
+        self.label_5.setGeometry(QRect(20, 360, 61, 25))
+        self.startBtn = QPushButton(Dialog)
+        self.startBtn.setObjectName(u"startBtn")
+        self.startBtn.setEnabled(False)
+        self.startBtn.setGeometry(QRect(200, 400, 161, 51))
+        self.label_6 = QLabel(Dialog)
+        self.label_6.setObjectName(u"label_6")
+        self.label_6.setGeometry(QRect(20, 340, 341, 17))
+        self.sequenceModeStatusLabel = QLabel(Dialog)
+        self.sequenceModeStatusLabel.setObjectName(u"sequenceModeStatusLabel")
+        self.sequenceModeStatusLabel.setGeometry(QRect(20, 410, 171, 17))
+        self.sequenceModeStatusLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.retranslateUi(Dialog)
 
@@ -385,5 +437,28 @@ class Ui_Dialog(object):
         self.getCurrentPoseBtn.setText(QCoreApplication.translate("Dialog", u"Get Current Pose", None))
         self.label_3.setText(QCoreApplication.translate("Dialog", u"Vel. Scale", None))
         self.label_4.setText(QCoreApplication.translate("Dialog", u"Acc. Scale", None))
+        ___qtablewidgetitem18 = self.sequenceTable.horizontalHeaderItem(0)
+        ___qtablewidgetitem18.setText(QCoreApplication.translate("Dialog", u"x", None));
+        ___qtablewidgetitem19 = self.sequenceTable.horizontalHeaderItem(1)
+        ___qtablewidgetitem19.setText(QCoreApplication.translate("Dialog", u"y", None));
+        ___qtablewidgetitem20 = self.sequenceTable.horizontalHeaderItem(2)
+        ___qtablewidgetitem20.setText(QCoreApplication.translate("Dialog", u"z", None));
+        ___qtablewidgetitem21 = self.sequenceTable.horizontalHeaderItem(3)
+        ___qtablewidgetitem21.setText(QCoreApplication.translate("Dialog", u"roll", None));
+        ___qtablewidgetitem22 = self.sequenceTable.horizontalHeaderItem(4)
+        ___qtablewidgetitem22.setText(QCoreApplication.translate("Dialog", u"pitch", None));
+        ___qtablewidgetitem23 = self.sequenceTable.horizontalHeaderItem(5)
+        ___qtablewidgetitem23.setText(QCoreApplication.translate("Dialog", u"yaw", None));
+        ___qtablewidgetitem24 = self.sequenceTable.horizontalHeaderItem(6)
+        ___qtablewidgetitem24.setText(QCoreApplication.translate("Dialog", u"trig", None));
+        ___qtablewidgetitem25 = self.sequenceTable.horizontalHeaderItem(7)
+        ___qtablewidgetitem25.setText(QCoreApplication.translate("Dialog", u"time", None));
+        ___qtablewidgetitem26 = self.sequenceTable.horizontalHeaderItem(8)
+        ___qtablewidgetitem26.setText(QCoreApplication.translate("Dialog", u"speed", None));
+        self.filePathLineEdit.setText(QCoreApplication.translate("Dialog", u"~/ros2ws/src/frontass/frontass/sequence_files/test0.csv", None))
+        self.label_5.setText(QCoreApplication.translate("Dialog", u"file path", None))
+        self.startBtn.setText(QCoreApplication.translate("Dialog", u"START", None))
+        self.label_6.setText(QCoreApplication.translate("Dialog", u"Sequence Mode", None))
+        self.sequenceModeStatusLabel.setText(QCoreApplication.translate("Dialog", u"status: NOT LOADED", None))
     # retranslateUi
 

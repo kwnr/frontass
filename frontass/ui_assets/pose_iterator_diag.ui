@@ -23,13 +23,13 @@
     </rect>
    </property>
    <property name="orientation">
-    <enum>Qt::Orientation::Horizontal</enum>
+    <enum>Qt::Horizontal</enum>
    </property>
    <property name="standardButtons">
-    <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QTableWidget" name="iterTable">
+  <widget class="QTableWidget" name="iter_table">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -39,22 +39,22 @@
     </rect>
    </property>
    <property name="focusPolicy">
-    <enum>Qt::FocusPolicy::NoFocus</enum>
+    <enum>Qt::NoFocus</enum>
    </property>
    <property name="verticalScrollBarPolicy">
-    <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+    <enum>Qt::ScrollBarAlwaysOff</enum>
    </property>
    <property name="horizontalScrollBarPolicy">
-    <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+    <enum>Qt::ScrollBarAlwaysOff</enum>
    </property>
    <property name="editTriggers">
-    <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+    <set>QAbstractItemView::NoEditTriggers</set>
    </property>
    <property name="selectionMode">
-    <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
+    <enum>QAbstractItemView::NoSelection</enum>
    </property>
    <property name="selectionBehavior">
-    <enum>QAbstractItemView::SelectionBehavior::SelectColumns</enum>
+    <enum>QAbstractItemView::SelectColumns</enum>
    </property>
    <attribute name="verticalHeaderStretchLastSection">
     <bool>true</bool>
@@ -189,7 +189,7 @@
    </row>
    <row>
     <property name="text">
-     <string>trigger</string>
+     <string>Trig</string>
     </property>
     <property name="textAlignment">
      <set>AlignCenter</set>
@@ -197,14 +197,15 @@
    </row>
    <row>
     <property name="text">
-     <string>time
-from
-start</string>
+     <string>Exec</string>
     </property>
-    <property name="font">
-     <font>
-      <italic>true</italic>
-     </font>
+    <property name="textAlignment">
+     <set>AlignCenter</set>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>Wait</string>
     </property>
     <property name="textAlignment">
      <set>AlignCenter</set>
@@ -220,39 +221,39 @@ start</string>
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>60</y>
+     <y>70</y>
      <width>67</width>
-     <height>30</height>
+     <height>25</height>
     </rect>
    </property>
    <property name="text">
     <string>Pose Path</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="posePathLineEdit">
+  <widget class="QLineEdit" name="pose_path_lineedit">
    <property name="geometry">
     <rect>
      <x>90</x>
-     <y>60</y>
-     <width>391</width>
-     <height>30</height>
+     <y>70</y>
+     <width>601</width>
+     <height>25</height>
     </rect>
    </property>
   </widget>
-  <widget class="QToolButton" name="posePathBtn">
+  <widget class="QToolButton" name="pose_path_btn">
    <property name="geometry">
     <rect>
-     <x>490</x>
-     <y>60</y>
-     <width>31</width>
-     <height>30</height>
+     <x>700</x>
+     <y>70</y>
+     <width>26</width>
+     <height>25</height>
     </rect>
    </property>
    <property name="text">
     <string>...</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="enabledBtn">
+  <widget class="QPushButton" name="enabled_btn">
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -298,7 +299,7 @@ start</string>
     <string/>
    </property>
    <property name="icon">
-    <iconset resource="buttons.qrc">
+    <iconset resource="../../../../../home/kwnr/arm_ws/src/aic_ui/ui_assets/buttons.qrc">
      <normaloff>:/toggle/off</normaloff>
      <normalon>:/toggle/on</normalon>:/toggle/off</iconset>
    </property>
@@ -328,25 +329,25 @@ start</string>
     <string>Enable</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="sendBtn">
+  <widget class="QPushButton" name="next_pose_btn">
    <property name="geometry">
     <rect>
-     <x>550</x>
+     <x>600</x>
      <y>20</y>
-     <width>171</width>
+     <width>121</width>
      <height>31</height>
     </rect>
    </property>
    <property name="text">
-    <string>SEND</string>
+    <string>Next Pose</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="convCritLineEdit">
+  <widget class="QLineEdit" name="conv_crit_line">
    <property name="geometry">
     <rect>
      <x>410</x>
      <y>20</y>
-     <width>111</width>
+     <width>113</width>
      <height>31</height>
     </rect>
    </property>
@@ -365,41 +366,9 @@ start</string>
 Criterion</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="execBtn">
-   <property name="geometry">
-    <rect>
-     <x>550</x>
-     <y>60</y>
-     <width>171</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>EXECUTE</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="statusLabel">
-   <property name="geometry">
-    <rect>
-     <x>550</x>
-     <y>90</y>
-     <width>171</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>STATUS: Not Loaded</string>
-   </property>
-   <property name="textFormat">
-    <enum>Qt::TextFormat::MarkdownText</enum>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignmentFlag::AlignCenter</set>
-   </property>
-  </widget>
  </widget>
  <resources>
-  <include location="buttons.qrc"/>
+  <include location="../../../../../home/kwnr/arm_ws/src/aic_ui/ui_assets/buttons.qrc"/>
  </resources>
  <connections>
   <connection>
